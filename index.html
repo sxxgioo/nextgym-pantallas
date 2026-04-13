@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Next Gym · Atención al socio</title>
+  <style>
+    :root {
+      --orange: #ff7a00;
+      --black: #111111;
+      --white: #ffffff;
+      --green: #22c55e;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --blue: #60a5fa;
+      --card: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.12);
+      --shadow: 0 20px 50px rgba(0,0,0,0.35);
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #111111 0%, #1f1f1f 100%);
+      color: var(--white);
+    }
+    body { min-height: 100vh; padding: 24px; }
+    .app { width: 100%; max-width: 1180px; margin: 0 auto; }
+    .panel {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+    .header {
+      padding: 22px 28px;
+      background: linear-gradient(90deg, var(--orange), #ff9e45);
+      color: var(--black);
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .header small { font-size: 0.8rem; font-weight: 700; opacity: 0.85; }
+    .screen-view {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 28px;
+      padding: 32px 28px 36px;
+      align-items: center;
+    }
+    .badge-row, .status-row, .admin-toolbar, .switch-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .screen-badge, .status-badge, .queue-pill, .auto-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-weight: 700;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.08);
+    }
+    .status-badge.available { background: rgba(34,197,94,0.16); color: #bbf7d0; border-color: rgba(34,197,94,0.4); }
+    .status-badge.busy { background: rgba(239,68,68,0.16); color: #fecaca; border-color: rgba(239,68,68,0.35); }
+    .status-badge.attending { background: rgba(96,165,250,0.16); color: #dbeafe; border-color: rgba(96,165,250,0.35); }
+    .title { font-size: 2.5rem; line-height: 1.08; margin: 18px 0 14px; }
+    .subtitle {
+      font-size: 1.12rem;
+      line-height: 1.65;
+      color: rgba(255,255,255,0.9);
+      margin: 0 0 22px;
+      max-width: 700px;
+    }
+    .steps {
+      display: grid;
+      gap: 10px;
+      margin: 0 0 26px;
+      padding: 0;
+      list-style: none;
+    }
+    .steps li, .mini-card, .request-card, .stat-card, .info-box, .switch-box {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+    }
+    .steps li { padding: 14px 16px; line-height: 1.45; }
+    .actions, .grid, .stats-grid, .requests-list, .switch-grid {
+      display: grid;
+      gap: 14px;
+    }
+    .actions { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .grid { grid-template-columns: 1fr 1fr; }
+    .stats-grid { grid-template-columns: repeat(3, 1fr); }
+    .switch-grid { grid-template-columns: 1fr 1fr; }
+    .btn {
+      appearance: none;
+      border: 0;
+      border-radius: 14px;
+      padding: 16px 18px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.15s ease, opacity 0.15s ease, filter 0.15s ease;
+      min-height: 54px;
+    }
+    .btn:hover { transform: translateY(-1px); filter: brightness(1.03); }
+    .btn:active { transform: translateY(0); }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; filter: none; }
+    .btn-primary { background: var(--orange); color: var(--black); }
+    .btn-secondary { background: transparent; color: var(--white); border: 1px solid rgba(255,255,255,0.2); }
+    .btn-success { background: var(--green); color: var(--black); }
+    .btn-danger { background: var(--red); color: var(--white); }
+    .btn-warning { background: var(--yellow); color: var(--black); }
+    .btn-blue { background: var(--blue); color: var(--black); }
+    .btn-small { padding: 10px 14px; min-height: auto; font-size: 0.92rem; }
+    .qr-panel {
+      background: var(--white);
+      color: var(--black);
+      border-radius: 24px;
+      padding: 22px;
+      text-align: center;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.06);
+    }
+    .qr-panel h2 { font-size: 1.15rem; margin: 0 0 14px; }
+    #qrcode { display: flex; justify-content: center; margin: 12px 0 14px; }
+    .small { font-size: 0.92rem; line-height: 1.5; color: #444; margin: 8px 0 0; word-break: break-word; }
+    .notice, .hero-message {
+      margin-top: 18px;
+      padding: 16px 18px;
+      border-radius: 16px;
+      line-height: 1.5;
+    }
+    .notice { background: rgba(255,122,0,0.12); border: 1px solid rgba(255,122,0,0.3); color: #ffd5ae; }
+    .hero-message.available { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.35); color: #dcfce7; }
+    .hero-message.busy { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.35); color: #fee2e2; }
+    .hero-message.attending { background: rgba(96,165,250,0.12); border: 1px solid rgba(96,165,250,0.35); color: #dbeafe; }
+    .footer { padding: 0 28px 28px; color: rgba(255,255,255,0.68); font-size: 0.9rem; line-height: 1.5; }
+    .admin-view { padding: 28px; display: grid; gap: 22px; }
+    .admin-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .admin-title { margin: 0; font-size: 2rem; line-height: 1.1; }
+    .admin-subtitle { margin: 8px 0 0; color: rgba(255,255,255,0.82); line-height: 1.55; max-width: 800px; }
+    .mini-card, .stat-card, .info-box, .request-card, .switch-box { padding: 18px; }
+    .mini-card h3, .stat-card h3, .info-box h3, .switch-box h3 { margin: 0 0 10px; font-size: 1rem; }
+    .stat-number { font-size: 2rem; font-weight: 800; margin-bottom: 6px; }
+    .muted { color: rgba(255,255,255,0.68); }
+    .request-card { display: grid; gap: 14px; }
+    .request-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .request-title { margin: 0; font-size: 1.12rem; }
+    .request-meta { color: rgba(255,255,255,0.76); font-size: 0.95rem; line-height: 1.45; }
+    .request-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .tabs { display: flex; gap: 10px; flex-wrap: wrap; }
+    .tab {
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      color: var(--white);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .tab.active { background: var(--orange); color: var(--black); border-color: transparent; }
+    .hidden { display: none !important; }
+    .empty-state {
+      padding: 26px;
+      text-align: center;
+      color: rgba(255,255,255,0.76);
+      border: 1px dashed rgba(255,255,255,0.16);
+      border-radius: 18px;
+    }
+    .code {
+      font-family: Consolas, Monaco, monospace;
+      font-size: 0.92rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 10px 12px;
+      border-radius: 12px;
+      display: inline-block;
+      word-break: break-all;
+    }
+    .switch-box { display: grid; gap: 14px; }
+    .config-box { white-space: pre-wrap; line-height: 1.45; }
+    @media (max-width: 920px) {
+      .screen-view, .grid, .stats-grid, .switch-grid { grid-template-columns: 1fr; }
+      .title { font-size: 2rem; }
+      .admin-title { font-size: 1.65rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <main class="panel">
+      <div class="header">
+        <span>Next Gym · Atención al socio</span>
+        <small id="modeLabel">Modo pantalla</small>
+      </div>
+
+      <section id="screenView" class="screen-view">
+        <div>
+          <div class="badge-row">
+            <div class="screen-badge" id="screenBadge">Pantalla 1</div>
+            <div class="status-badge available" id="publicStatusBadge">Disponible</div>
+          </div>
+
+          <h1 class="title" id="publicTitle">¿Necesitas ayuda?</h1>
+          <p class="subtitle" id="publicSubtitle">Escanea el código QR con tu móvil para avisar a recepción. Si estamos disponibles, tu solicitud entrará al instante.</p>
+
+          <ul class="steps">
+            <li><strong>1.</strong> Escanea el código QR con tu móvil.</li>
+            <li><strong>2.</strong> Se abrirá esta web en tu teléfono.</li>
+            <li><strong>3.</strong> Pulsa el botón para solicitar atención.</li>
+          </ul>
+
+          <div class="actions">
+            <button id="requestHelpButton" class="btn btn-primary" type="button">Solicitar ayuda ahora</button>
+            <button id="copyLinkButton" class="btn btn-secondary" type="button">Copiar enlace</button>
+          </div>
+
+          <div class="hero-message available" id="publicMessage">Estamos disponibles. Tu solicitud se mostrará en el panel de recepción.</div>
+
+          <div class="notice">Esta versión ya está preparada para Firebase en tiempo real. Solo tienes que pegar tu configuración y reglas.</div>
+        </div>
+
+        <aside class="qr-panel">
+          <h2>Escanea para solicitar ayuda</h2>
+          <div id="qrcode"></div>
+          <p class="small" id="qrText"></p>
+          <p class="small"><strong>Panel interno:</strong><br><span id="adminUrlText"></span></p>
+        </aside>
+      </section>
+
+      <section id="adminView" class="admin-view hidden">
+        <div class="admin-top">
+          <div>
+            <h1 class="admin-title">Panel interno de avisos</h1>
+            <p class="admin-subtitle">Desde aquí puedes marcar si estáis disponibles o no, ver las solicitudes en tiempo real y activar automatizaciones para la alarma, VDO.Ninja y el modo ocupado.</p>
+          </div>
+          <div class="admin-toolbar">
+            <button id="setAvailableBtn" class="btn btn-success btn-small" type="button">Marcar disponible</button>
+            <button id="setBusyBtn" class="btn btn-danger btn-small" type="button">Marcar no disponible</button>
+            <button id="clearAllBtn" class="btn btn-secondary btn-small" type="button">Vaciar avisos</button>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h3>Estado actual</h3>
+            <div class="stat-number" id="statusSummary">Disponible</div>
+            <div class="muted">Este estado se refleja en las pantallas públicas.</div>
+          </div>
+          <div class="stat-card">
+            <h3>Solicitudes pendientes</h3>
+            <div class="stat-number" id="pendingCount">0</div>
+            <div class="muted">Avisos aún sin gestionar.</div>
+          </div>
+          <div class="stat-card">
+            <h3>Total registradas</h3>
+            <div class="stat-number" id="totalCount">0</div>
+            <div class="muted">Ya compartidas en Firebase.</div>
+          </div>
+        </div>
+
+        <div class="switch-grid">
+          <div class="switch-box">
+            <h3>Automatizaciones</h3>
+            <div class="switch-actions">
+              <button id="toggleAlarmBtn" class="btn btn-secondary btn-small" type="button">Alarma: OFF</button>
+              <button id="toggleAutoBusyBtn" class="btn btn-secondary btn-small" type="button">Auto ocupado: OFF</button>
+              <button id="toggleAutoVdoBtn" class="btn btn-secondary btn-small" type="button">Auto VDO.Ninja: OFF</button>
+              <button id="toggleAutoFreeBtn" class="btn btn-secondary btn-small" type="button">Auto disponible: OFF</button>
+            </div>
+            <p class="muted">“Auto disponible” vuelve a disponible al marcar gestionada la solicitud activa.</p>
+          </div>
+          <div class="switch-box">
+            <h3>Enlaces VDO.Ninja</h3>
+            <p class="muted">Configura la sala que debe abrirse al llegar una solicitud.</p>
+            <div class="code" id="vdoInfoCode">Pantalla 1 y Pantalla 2 configurables en el código.</div>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="mini-card">
+            <h3>Acceso al panel</h3>
+            <p class="muted">Abre esta misma web con <span class="code">?admin=1</span> para ver la cara interna.</p>
+            <div class="code" id="adminUrlCode"></div>
+          </div>
+          <div class="mini-card">
+            <h3>Estado visible para socios</h3>
+            <div class="status-row">
+              <div class="status-badge available" id="adminStatusBadge">Disponible</div>
+              <div class="queue-pill" id="queueBadge">0 avisos pendientes</div>
+              <div class="auto-pill" id="autoSummaryBadge">Auto: manual</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <h3>Configuración Firebase</h3>
+          <div class="muted config-box" id="firebaseHelp"></div>
+        </div>
+
+        <div class="tabs">
+          <button class="tab active" type="button" data-filter="all">Todas</button>
+          <button class="tab" type="button" data-filter="1">Pantalla 1</button>
+          <button class="tab" type="button" data-filter="2">Pantalla 2</button>
+        </div>
+
+        <div id="requestsList" class="requests-list"></div>
+        <div id="emptyState" class="empty-state hidden">Todavía no hay solicitudes registradas.</div>
+      </section>
+
+      <div class="footer">Importante: la apertura automática de VDO.Ninja y el sonido pueden ser bloqueados por el navegador hasta que hagas al menos un clic en el panel. Para que funcione, crea un proyecto en Firebase, activa Firestore y pega tu configuración en el bloque FIREBASE_CONFIG del código.</div>
+    </main>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
+    import {
+      getFirestore,
+      doc,
+      collection,
+      addDoc,
+      updateDoc,
+      deleteDoc,
+      setDoc,
+      getDoc,
+      getDocs,
+      onSnapshot,
+      query,
+      orderBy,
+      writeBatch,
+      serverTimestamp,
+      Timestamp
+    } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+
+    // =====================================
+    // PEGA AQUÍ TU CONFIG DE FIREBASE
+    // =====================================
+    const FIREBASE_CONFIG = {
+      apiKey: 'PEGA_AQUI_API_KEY',
+      authDomain: 'PEGA_AQUI_AUTH_DOMAIN',
+      projectId: 'PEGA_AQUI_PROJECT_ID',
+      storageBucket: 'PEGA_AQUI_STORAGE_BUCKET',
+      messagingSenderId: 'PEGA_AQUI_MESSAGING_SENDER_ID',
+      appId: 'PEGA_AQUI_APP_ID'
+    };
+
+    const ROOM_ID = 'nextgym';
+    const VDO_LINKS = {
+      '1': 'https://vdo.ninja/?room=nextgym1&director=1',
+      '2': 'https://vdo.ninja/?room=nextgym2&director=1'
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const isAdmin = params.get('admin') === '1';
+    const screen = params.get('p') || '1';
+
+    const screenNames = {
+      '1': 'Pantalla 1',
+      '2': 'Pantalla 2'
+    };
+
+    let db = null;
+    let state = {
+      available: true,
+      autoAlarm: false,
+      autoBusy: false,
+      autoVdo: false,
+      autoFree: false,
+      activeRequestId: null,
+      lastVdoOpenedFor: null
+    };
+    let requests = [];
+    let lastSeenPendingIds = [];
+    let audioUnlocked = false;
+
+    function hasFirebaseConfig() {
+      return FIREBASE_CONFIG.apiKey && !FIREBASE_CONFIG.apiKey.startsWith('PEGA_AQUI');
+    }
+
+    function stateRef() {
+      return doc(db, 'rooms', ROOM_ID);
+    }
+
+    function requestsRef() {
+      return collection(db, 'rooms', ROOM_ID, 'requests');
+    }
+
+    function requestRef(id) {
+      return doc(db, 'rooms', ROOM_ID, 'requests', id);
+    }
+
+    function buildPublicUrl(screenId) {
+      return `${window.location.origin}${window.location.pathname}?p=${encodeURIComponent(screenId)}`;
+    }
+
+    function buildAdminUrl() {
+      return `${window.location.origin}${window.location.pathname}?admin=1`;
+    }
+
+    function getPendingRequests() {
+      return requests.filter((item) => !item.handled);
+    }
+
+    function getActiveRequest() {
+      const pending = getPendingRequests();
+      return pending.find((item) => item.id === state.activeRequestId) || pending[0] || null;
+    }
+
+    function fmtDate(value) {
+      const date = value instanceof Timestamp ? value.toDate() : new Date(value);
+      return date.toLocaleString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+    }
+
+    function ensureAudioUnlocked() {
+      audioUnlocked = true;
+    }
+
+    function playBeep() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const oscillator = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(880, ctx.currentTime);
+        gainNode.gain.setValueAtTime(0.001, ctx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.02);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+        oscillator.connect(gainNode);
+        gainNode.connect(ctx.destination);
+        oscillator.start();
+        oscillator.stop(ctx.currentTime + 0.36);
+      } catch (_) {}
+    }
+
+    async function openVdoForRequest(request) {
+      if (!request) return;
+      const url = VDO_LINKS[request.screen];
+      if (!url) return;
+      window.open(url, '_blank', 'noopener,noreferrer');
+      await updateDoc(stateRef(), { lastVdoOpenedFor: request.id });
+    }
+
+    async function setAvailability(isAvailable) {
+      await updateDoc(stateRef(), {
+        available: isAvailable,
+        ...(isAvailable ? { activeRequestId: null } : {})
+      });
+    }
+
+    async function toggleFlag(flagName) {
+      await updateDoc(stateRef(), { [flagName]: !state[flagName] });
+    }
+
+    async function addRequest(screenId) {
+      const newRequest = {
+        screen: String(screenId),
+        screenLabel: screenNames[String(screenId)] || `Pantalla ${screenId}`,
+        createdAt: serverTimestamp(),
+        handled: false
+      };
+      const created = await addDoc(requestsRef(), newRequest);
+      const patch = {};
+      if (state.autoBusy) patch.available = false;
+      if (!state.activeRequestId) patch.activeRequestId = created.id;
+      if (Object.keys(patch).length) await updateDoc(stateRef(), patch);
+      return { id: created.id, ...newRequest };
+    }
+
+    async function markHandled(id) {
+      const request = requests.find((item) => item.id === id);
+      await updateDoc(requestRef(id), { handled: true });
+      const patch = { lastVdoOpenedFor: id };
+      if (state.activeRequestId === id) patch.activeRequestId = null;
+      if (state.autoFree && state.activeRequestId === id) patch.available = true;
+      await updateDoc(stateRef(), patch);
+      const pendingAfter = getPendingRequests().filter((item) => item.id !== id);
+      if (state.autoFree && !pendingAfter.length) {
+        await updateDoc(stateRef(), { available: true });
+      }
+      return request;
+    }
+
+    async function removeRequest(id) {
+      const patch = {};
+      if (state.activeRequestId === id) patch.activeRequestId = null;
+      await deleteDoc(requestRef(id));
+      if (Object.keys(patch).length) await updateDoc(stateRef(), patch);
+    }
+
+    async function clearAllRequests() {
+      const snap = await getDocs(requestsRef());
+      const batch = writeBatch(db);
+      snap.forEach((item) => batch.delete(item.ref));
+      batch.update(stateRef(), { activeRequestId: null });
+      await batch.commit();
+    }
+
+    async function setActiveRequest(id) {
+      await updateDoc(stateRef(), { activeRequestId: id });
+    }
+
+    async function ensureRoomState() {
+      const roomSnap = await getDoc(stateRef());
+      if (!roomSnap.exists()) {
+        await setDoc(stateRef(), {
+          available: true,
+          autoAlarm: false,
+          autoBusy: false,
+          autoVdo: false,
+          autoFree: false,
+          activeRequestId: null,
+          lastVdoOpenedFor: null,
+          updatedAt: serverTimestamp()
+        });
+      }
+    }
+
+    async function maybeRunAutomations() {
+      if (!isAdmin) return;
+      const pending = getPendingRequests();
+      const pendingIds = pending.map((item) => item.id);
+      const newPending = pending.filter((item) => !lastSeenPendingIds.includes(item.id));
+      const activeRequest = getActiveRequest();
+
+      if (newPending.length && state.autoAlarm && audioUnlocked) {
+        playBeep();
+        setTimeout(playBeep, 420);
+      }
+
+      if (newPending.length && state.autoBusy && state.available) {
+        await updateDoc(stateRef(), { available: false });
+        lastSeenPendingIds = pendingIds;
+        return;
+      }
+
+      if (newPending.length && state.autoVdo && activeRequest && state.lastVdoOpenedFor !== activeRequest.id) {
+        lastSeenPendingIds = pendingIds;
+        await openVdoForRequest(activeRequest);
+        return;
+      }
+
+      lastSeenPendingIds = pendingIds;
+    }
+
+    function renderPublic() {
+      const currentScreenLabel = screenNames[screen] || `Pantalla ${screen}`;
+      const publicUrl = buildPublicUrl(screen);
+      const adminUrl = buildAdminUrl();
+      const activeRequest = getActiveRequest();
+      const thisScreenIsActive = activeRequest && activeRequest.screen === String(screen) && !activeRequest.handled;
+
+      document.getElementById('modeLabel').textContent = 'Modo pantalla';
+      document.getElementById('screenBadge').textContent = currentScreenLabel;
+      document.getElementById('qrText').textContent = publicUrl;
+      document.getElementById('adminUrlText').textContent = adminUrl;
+
+      const title = document.getElementById('publicTitle');
+      const subtitle = document.getElementById('publicSubtitle');
+      const message = document.getElementById('publicMessage');
+      const statusBadge = document.getElementById('publicStatusBadge');
+      const button = document.getElementById('requestHelpButton');
+
+      if (thisScreenIsActive) {
+        title.textContent = 'Te estamos atendiendo';
+        subtitle.textContent = 'Recepción ha recibido la solicitud de esta pantalla. En breve se abrirá la videollamada o te atenderemos directamente.';
+        message.textContent = 'Solicitud activa en curso para esta pantalla.';
+        message.className = 'hero-message attending';
+        statusBadge.textContent = 'Atendiendo';
+        statusBadge.className = 'status-badge attending';
+        button.disabled = true;
+        button.textContent = 'Solicitud enviada';
+        button.className = 'btn btn-blue';
+      } else if (state.available) {
+        title.textContent = '¿Necesitas ayuda?';
+        subtitle.textContent = 'Escanea el código QR con tu móvil para avisar a recepción. Si estamos disponibles, tu solicitud entrará al instante.';
+        message.textContent = 'Estamos disponibles. Tu solicitud se mostrará en el panel de recepción.';
+        message.className = 'hero-message available';
+        statusBadge.textContent = 'Disponible';
+        statusBadge.className = 'status-badge available';
+        button.disabled = false;
+        button.textContent = 'Solicitar ayuda ahora';
+        button.className = 'btn btn-primary';
+      } else {
+        title.textContent = 'Ahora mismo estamos ocupados';
+        subtitle.textContent = 'Puedes escanear igualmente el QR y dejar tu aviso. En cuanto quedemos disponibles veremos la solicitud en el panel interno.';
+        message.textContent = 'No disponibles en este momento. Tu solicitud quedará en cola para ser atendida.';
+        message.className = 'hero-message busy';
+        statusBadge.textContent = 'No disponible';
+        statusBadge.className = 'status-badge busy';
+        button.disabled = false;
+        button.textContent = 'Dejar aviso en cola';
+        button.className = 'btn btn-warning';
+      }
+
+      const qrContainer = document.getElementById('qrcode');
+      qrContainer.innerHTML = '';
+      new QRCode(qrContainer, {
+        text: publicUrl,
+        width: 220,
+        height: 220,
+        correctLevel: QRCode.CorrectLevel.H
+      });
+    }
+
+    function renderAdmin() {
+      document.getElementById('modeLabel').textContent = 'Modo panel interno';
+      const filter = document.querySelector('.tab.active')?.dataset.filter || 'all';
+      const filtered = requests.filter((item) => filter === 'all' ? true : item.screen === filter);
+      const pending = getPendingRequests().length;
+      const activeRequest = getActiveRequest();
+
+      document.getElementById('statusSummary').textContent = state.available ? 'Disponible' : 'No disponible';
+      document.getElementById('pendingCount').textContent = pending;
+      document.getElementById('totalCount').textContent = requests.length;
+      document.getElementById('adminUrlCode').textContent = buildAdminUrl();
+      document.getElementById('queueBadge').textContent = `${pending} aviso${pending === 1 ? '' : 's'} pendientes`;
+      document.getElementById('vdoInfoCode').textContent = `P1: ${VDO_LINKS['1']} | P2: ${VDO_LINKS['2']}`;
+      document.getElementById('firebaseHelp').textContent = `1) Crea proyecto en Firebase\n2) Activa Firestore Database\n3) Pega tu configuración en FIREBASE_CONFIG\n4) Publica este HTML en tu web\n5) Abre ?admin=1 en recepción y ?p=1 / ?p=2 en las pantallas\n\nReglas rápidas de Firestore para probar:\nrules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    match /rooms/{roomId} {\n      allow read, write: if true;\n      match /requests/{requestId} {\n        allow read, write: if true;\n      }\n    }\n  }\n}`;
+
+      const adminStatusBadge = document.getElementById('adminStatusBadge');
+      if (activeRequest) {
+        adminStatusBadge.textContent = `Atendiendo ${activeRequest.screenLabel}`;
+        adminStatusBadge.className = 'status-badge attending';
+      } else if (state.available) {
+        adminStatusBadge.textContent = 'Disponible';
+        adminStatusBadge.className = 'status-badge available';
+      } else {
+        adminStatusBadge.textContent = 'No disponible';
+        adminStatusBadge.className = 'status-badge busy';
+      }
+
+      const autoTexts = [];
+      if (state.autoAlarm) autoTexts.push('alarma');
+      if (state.autoBusy) autoTexts.push('ocupado');
+      if (state.autoVdo) autoTexts.push('VDO');
+      if (state.autoFree) autoTexts.push('disponible');
+      document.getElementById('autoSummaryBadge').textContent = autoTexts.length ? `Auto: ${autoTexts.join(' + ')}` : 'Auto: manual';
+
+      const toggleAlarmBtn = document.getElementById('toggleAlarmBtn');
+      const toggleAutoBusyBtn = document.getElementById('toggleAutoBusyBtn');
+      const toggleAutoVdoBtn = document.getElementById('toggleAutoVdoBtn');
+      const toggleAutoFreeBtn = document.getElementById('toggleAutoFreeBtn');
+
+      toggleAlarmBtn.textContent = `Alarma: ${state.autoAlarm ? 'ON' : 'OFF'}`;
+      toggleAutoBusyBtn.textContent = `Auto ocupado: ${state.autoBusy ? 'ON' : 'OFF'}`;
+      toggleAutoVdoBtn.textContent = `Auto VDO.Ninja: ${state.autoVdo ? 'ON' : 'OFF'}`;
+      toggleAutoFreeBtn.textContent = `Auto disponible: ${state.autoFree ? 'ON' : 'OFF'}`;
+
+      toggleAlarmBtn.className = state.autoAlarm ? 'btn btn-success btn-small' : 'btn btn-secondary btn-small';
+      toggleAutoBusyBtn.className = state.autoBusy ? 'btn btn-success btn-small' : 'btn btn-secondary btn-small';
+      toggleAutoVdoBtn.className = state.autoVdo ? 'btn btn-success btn-small' : 'btn btn-secondary btn-small';
+      toggleAutoFreeBtn.className = state.autoFree ? 'btn btn-success btn-small' : 'btn btn-secondary btn-small';
+
+      const list = document.getElementById('requestsList');
+      const emptyState = document.getElementById('emptyState');
+      list.innerHTML = '';
+
+      if (!filtered.length) emptyState.classList.remove('hidden');
+      else emptyState.classList.add('hidden');
+
+      filtered.forEach((item) => {
+        const card = document.createElement('article');
+        card.className = 'request-card';
+        const pendingClass = item.handled
+          ? 'status-badge available'
+          : (item.id === state.activeRequestId ? 'status-badge attending' : 'status-badge busy');
+        const isActive = item.id === state.activeRequestId && !item.handled;
+
+        card.innerHTML = `
+          <div class="request-head">
+            <div>
+              <h3 class="request-title">Solicitud desde ${item.screenLabel}</h3>
+              <div class="request-meta">Registrada el ${fmtDate(item.createdAt)}</div>
+            </div>
+            <div class="${pendingClass}">${item.handled ? 'Gestionada' : (isActive ? 'Atendiendo' : 'Pendiente')}</div>
+          </div>
+          <div class="request-actions">
+            ${!item.handled && !isActive ? `<button class="btn btn-blue btn-small" data-action="activate" data-id="${item.id}" type="button">Atender esta</button>` : ''}
+            ${!item.handled ? `<button class="btn btn-warning btn-small" data-action="open-vdo" data-id="${item.id}" type="button">Abrir VDO.Ninja</button>` : ''}
+            ${!item.handled ? `<button class="btn btn-success btn-small" data-action="handle" data-id="${item.id}" type="button">Marcar gestionada</button>` : ''}
+            <button class="btn btn-secondary btn-small" data-action="delete" data-id="${item.id}" type="button">Eliminar</button>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    function render() {
+      if (isAdmin) {
+        document.getElementById('screenView').classList.add('hidden');
+        document.getElementById('adminView').classList.remove('hidden');
+        renderAdmin();
+      } else {
+        document.getElementById('adminView').classList.add('hidden');
+        document.getElementById('screenView').classList.remove('hidden');
+        renderPublic();
+      }
+    }
+
+    document.body.addEventListener('click', ensureAudioUnlocked, { once: true });
+    document.body.addEventListener('keydown', ensureAudioUnlocked, { once: true });
+
+    document.getElementById('requestHelpButton').addEventListener('click', async () => {
+      const request = await addRequest(screen);
+      alert(`Aviso enviado correctamente desde ${screenNames[screen] || `Pantalla ${screen}`}.`);
+    });
+
+    document.getElementById('copyLinkButton').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(buildPublicUrl(screen));
+        const btn = document.getElementById('copyLinkButton');
+        const original = btn.textContent;
+        btn.textContent = 'Enlace copiado';
+        setTimeout(() => btn.textContent = original, 1600);
+      } catch (_) {
+        alert('No se pudo copiar el enlace automáticamente.');
+      }
+    });
+
+    document.getElementById('setAvailableBtn')?.addEventListener('click', () => setAvailability(true));
+    document.getElementById('setBusyBtn')?.addEventListener('click', () => setAvailability(false));
+    document.getElementById('clearAllBtn')?.addEventListener('click', async () => {
+      if (confirm('¿Seguro que quieres borrar todos los avisos?')) await clearAllRequests();
+    });
+    document.getElementById('toggleAlarmBtn')?.addEventListener('click', () => toggleFlag('autoAlarm'));
+    document.getElementById('toggleAutoBusyBtn')?.addEventListener('click', () => toggleFlag('autoBusy'));
+    document.getElementById('toggleAutoVdoBtn')?.addEventListener('click', () => toggleFlag('autoVdo'));
+    document.getElementById('toggleAutoFreeBtn')?.addEventListener('click', () => toggleFlag('autoFree'));
+
+    document.querySelectorAll('.tab').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach((t) => t.classList.remove('active'));
+        tab.classList.add('active');
+        render();
+      });
+    });
+
+    document.getElementById('requestsList').addEventListener('click', async (event) => {
+      const button = event.target.closest('button[data-action]');
+      if (!button) return;
+      const { action, id } = button.dataset;
+      const request = requests.find((item) => item.id === id);
+      if (action === 'handle') await markHandled(id);
+      if (action === 'delete') await removeRequest(id);
+      if (action === 'activate') await setActiveRequest(id);
+      if (action === 'open-vdo' && request) {
+        await setActiveRequest(id);
+        await openVdoForRequest(request);
+      }
+    });
+
+    async function initFirebase() {
+      if (!hasFirebaseConfig()) {
+        document.getElementById('firebaseHelp').textContent = 'Falta configurar Firebase. Pega tus claves en FIREBASE_CONFIG y vuelve a cargar la página.';
+        render();
+        return;
+      }
+
+      const app = initializeApp(FIREBASE_CONFIG);
+      db = getFirestore(app);
+      await ensureRoomState();
+
+      onSnapshot(stateRef(), async (snap) => {
+        if (snap.exists()) {
+          state = { ...state, ...snap.data() };
+          render();
+          await maybeRunAutomations();
+        }
+      });
+
+      onSnapshot(query(requestsRef(), orderBy('createdAt', 'desc')), async (snap) => {
+        requests = snap.docs.map((item) => ({ id: item.id, ...item.data() }));
+        render();
+        await maybeRunAutomations();
+      });
+    }
+
+    render();
+    initFirebase();
+  </script>
+</body>
+</html>
