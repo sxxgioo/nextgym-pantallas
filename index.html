@@ -588,22 +588,6 @@
       lastSeenPendingIds = pendingIds;
     }
 
-    function renderPublic() {
-      const currentScreenLabel = screenNames[screen] || `Pantalla ${screen}`;
-      const publicUrl = buildPublicUrl(screen);
-      const adminUrl = buildAdminUrl();
-      const activeRequest = getActiveRequest();
-      const thisScreenIsActive = activeRequest && activeRequest.screen === String(screen) && !activeRequest.handled;
-
-      document.getElementById('modeLabel').textContent = 'Modo pantalla';
-      document.getElementById('screenBadge').textContent = currentScreenLabel;
-      
-
-      const title = document.getElementById('publicTitle');
-      const subtitle = document.getElementById('publicSubtitle');
-      const message = document.getElementById('publicMessage');
-      const statusBadge = document.getElementById('publicStatusBadge');
-      const button = document.getElementById('requestHelpButton');
 
       if (thisScreenIsActive) {
         title.textContent = 'Te estamos atendiendo';
