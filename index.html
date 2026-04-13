@@ -244,7 +244,7 @@
 
           <div class="hero-message available" id="publicMessage">Estamos disponibles. Tu solicitud se mostrará en el panel de recepción.</div>
 
-          <div class="notice">Esta versión ya está preparada para Firebase en tiempo real. Solo tienes que pegar tu configuración y reglas.</div>
+          <div class="notice">Esta versión ya está preparada para Firebase en tiempo real.</div>
         </div>
 
         <aside class="qr-panel">
@@ -335,7 +335,7 @@
         <div id="emptyState" class="empty-state hidden">Todavía no hay solicitudes registradas.</div>
       </section>
 
-      <div class="footer">Importante: la apertura automática de VDO.Ninja y el sonido pueden ser bloqueados por el navegador hasta que hagas al menos un clic en el panel. Para que funcione, crea un proyecto en Firebase, activa Firestore y pega tu configuración en el bloque FIREBASE_CONFIG del código.</div>
+      <div class="footer">Importante: la apertura automática de VDO.Ninja y el sonido pueden ser bloqueados por el navegador hasta que hagas al menos un clic en el panel.</div>
     </main>
   </div>
 
@@ -360,16 +360,13 @@
       Timestamp
     } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 
-    // =====================================
-    // PEGA AQUÍ TU CONFIG DE FIREBASE
-    // =====================================
     const FIREBASE_CONFIG = {
-      apiKey: 'PEGA_AQUI_API_KEY',
-      authDomain: 'PEGA_AQUI_AUTH_DOMAIN',
-      projectId: 'PEGA_AQUI_PROJECT_ID',
-      storageBucket: 'PEGA_AQUI_STORAGE_BUCKET',
-      messagingSenderId: 'PEGA_AQUI_MESSAGING_SENDER_ID',
-      appId: 'PEGA_AQUI_APP_ID'
+      apiKey: "AIzaSyB_C4gc8esz6wNIiW17Ig0I9oRtNr1g_bE",
+      authDomain: "nextgym-402e3.firebaseapp.com",
+      projectId: "nextgym-402e3",
+      storageBucket: "nextgym-402e3.firebasestorage.app",
+      messagingSenderId: "386550395511",
+      appId: "1:386550395511:web:2725708cb37372a5f28c72"
     };
 
     const ROOM_ID = 'nextgym';
@@ -652,7 +649,7 @@
       document.getElementById('adminUrlCode').textContent = buildAdminUrl();
       document.getElementById('queueBadge').textContent = `${pending} aviso${pending === 1 ? '' : 's'} pendientes`;
       document.getElementById('vdoInfoCode').textContent = `P1: ${VDO_LINKS['1']} | P2: ${VDO_LINKS['2']}`;
-      document.getElementById('firebaseHelp').textContent = `1) Crea proyecto en Firebase\n2) Activa Firestore Database\n3) Pega tu configuración en FIREBASE_CONFIG\n4) Publica este HTML en tu web\n5) Abre ?admin=1 en recepción y ?p=1 / ?p=2 en las pantallas\n\nReglas rápidas de Firestore para probar:\nrules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    match /rooms/{roomId} {\n      allow read, write: if true;\n      match /requests/{requestId} {\n        allow read, write: if true;\n      }\n    }\n  }\n}`;
+      document.getElementById('firebaseHelp').textContent = `Reglas rápidas de Firestore para probar:\nrules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    match /rooms/{roomId} {\n      allow read, write: if true;\n      match /requests/{requestId} {\n        allow read, write: if true;\n      }\n    }\n  }\n}`;
 
       const adminStatusBadge = document.getElementById('adminStatusBadge');
       if (activeRequest) {
