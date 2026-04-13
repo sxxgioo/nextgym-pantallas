@@ -138,7 +138,6 @@
     }
     .qr-panel h2 { font-size: 1.15rem; margin: 0 0 14px; }
     #qrcode { display: flex; justify-content: center; margin: 12px 0 14px; }
-    .small { font-size: 0.92rem; line-height: 1.5; color: #444; margin: 8px 0 0; word-break: break-word; }
     .notice, .hero-message {
       margin-top: 18px;
       padding: 16px 18px;
@@ -224,7 +223,7 @@
       <section id="screenView" class="screen-view">
         <div>
           <div class="badge-row">
-            <div class="screen-badge" id="screenBadge">Pantalla 1</div>
+            <div class="screen-badge" id="screenBadge">Sala Alcobendas</div>
             <div class="status-badge available" id="publicStatusBadge">Disponible</div>
           </div>
 
@@ -244,13 +243,12 @@
 
           <div class="hero-message available" id="publicMessage">Estamos disponibles. Tu solicitud se mostrará en el panel de recepción.</div>
 
-          
+          <div class="notice">Esta versión ya está preparada para Firebase en tiempo real.</div>
         </div>
 
         <aside class="qr-panel">
           <h2>Escanea para solicitar ayuda</h2>
           <div id="qrcode"></div>
-          
         </aside>
       </section>
 
@@ -258,7 +256,7 @@
         <div class="admin-top">
           <div>
             <h1 class="admin-title">Panel interno de avisos</h1>
-            <p class="admin-subtitle">Desde aquí puedes marcar si estáis disponibles o no, ver las solicitudes en tiempo real y activar automatizaciones para la alarma, Zoom y el modo ocupado.</p>
+            <p class="admin-subtitle">Desde aquí puedes marcar si estáis disponibles o no, ver las solicitudes en tiempo real y activar automatizaciones para la alarma, VDO.Ninja y el modo ocupado.</p>
           </div>
           <div class="admin-toolbar">
             <button id="setAvailableBtn" class="btn btn-success btn-small" type="button">Marcar disponible</button>
@@ -291,13 +289,13 @@
             <div class="switch-actions">
               <button id="toggleAlarmBtn" class="btn btn-secondary btn-small" type="button">Alarma: OFF</button>
               <button id="toggleAutoBusyBtn" class="btn btn-secondary btn-small" type="button">Auto ocupado: OFF</button>
-              <button id="toggleAutoVdoBtn" class="btn btn-secondary btn-small" type="button">Auto Zoom: OFF</button>
+              <button id="toggleAutoVdoBtn" class="btn btn-secondary btn-small" type="button">Auto VDO.Ninja: OFF</button>
               <button id="toggleAutoFreeBtn" class="btn btn-secondary btn-small" type="button">Auto disponible: OFF</button>
             </div>
             <p class="muted">“Auto disponible” vuelve a disponible al marcar gestionada la solicitud activa.</p>
           </div>
           <div class="switch-box">
-            <h3>Enlaces Zoom</h3>
+            <h3>Enlaces VDO.Ninja</h3>
             <p class="muted">Configura la sala que debe abrirse al llegar una solicitud.</p>
             <div class="code" id="vdoInfoCode">Pantalla 1 y Pantalla 2 configurables en el código.</div>
           </div>
@@ -334,7 +332,7 @@
         <div id="emptyState" class="empty-state hidden">Todavía no hay solicitudes registradas.</div>
       </section>
 
-      <div class="footer">Importante: la apertura automática de Zoom y el sonido pueden ser bloqueados por el navegador hasta que hagas al menos un clic en el panel. Para que funcione, crea un proyecto en Firebase, activa Firestore y pega tu configuración en el bloque FIREBASE_CONFIG del código.</div>
+      <div class="footer">Importante: la apertura automática de VDO.Ninja y el sonido pueden ser bloqueados por el navegador hasta que hagas al menos un clic en el panel.</div>
     </main>
   </div>
 
@@ -359,24 +357,19 @@
       Timestamp
     } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 
-    // =====================================
-    // PEGA AQUÍ TU CONFIG DE FIREBASE
-    // =====================================
     const FIREBASE_CONFIG = {
-      apiKey: 'PEGA_AQUI_API_KEY',
-      authDomain: 'PEGA_AQUI_AUTH_DOMAIN',
-      projectId: 'PEGA_AQUI_PROJECT_ID',
-      storageBucket: 'PEGA_AQUI_STORAGE_BUCKET',
-      messagingSenderId: 'PEGA_AQUI_MESSAGING_SENDER_ID',
-      appId: 'PEGA_AQUI_APP_ID'
+      apiKey: "AIzaSyB_C4gc8esz6wNIiW17Ig0I9oRtNr1g_bE",
+      authDomain: "nextgym-402e3.firebaseapp.com",
+      projectId: "nextgym-402e3",
+      storageBucket: "nextgym-402e3.firebasestorage.app",
+      messagingSenderId: "386550395511",
+      appId: "1:386550395511:web:2725708cb37372a5f28c72"
     };
 
     const ROOM_ID = 'nextgym';
-    // CONFIGURACIÓN ZOOM
-    // CONFIGURACIÓN ZOOM
-    const ZOOM_LINKS = {
-      '1': 'https://zoom.us/j/83560160551',
-      '2': 'https://zoom.us/j/XXXXXXXXXX'
+    const VDO_LINKS = {
+      '1': 'https://vdo.ninja/?room=nextgym1&director=1',
+      '2': 'https://vdo.ninja/?room=nextgym2&director=1'
     };
 
     const params = new URLSearchParams(window.location.search);
@@ -470,20 +463,12 @@
       } catch (_) {}
     }
 
-    async function openZoomForRequest(request) {
+    async function openVdoForRequest(request) {
       if (!request) return;
-      const url = ZOOM_LINKS[request.screen];
+      const url = VDO_LINKS[request.screen];
       if (!url) return;
-
-      const zoomAppUrl = url.replace('https://zoom.us/j/', 'zoommtg://zoom.us/join?confno=');
-
-      window.open(zoomAppUrl, '_blank');
-      setTimeout(() => {
-        window.open(url, '_blank');
-      }, 1500);
-
+      window.open(url, '_blank', 'noopener,noreferrer');
       await updateDoc(stateRef(), { lastVdoOpenedFor: request.id });
-    });
     }
 
     async function setAvailability(isAvailable) {
@@ -581,7 +566,7 @@
 
       if (newPending.length && state.autoVdo && activeRequest && state.lastVdoOpenedFor !== activeRequest.id) {
         lastSeenPendingIds = pendingIds;
-        await openZoomForRequest(activeRequest);
+        await openVdoForRequest(activeRequest);
         return;
       }
 
@@ -591,13 +576,11 @@
     function renderPublic() {
       const currentScreenLabel = screenNames[screen] || `Pantalla ${screen}`;
       const publicUrl = buildPublicUrl(screen);
-      const adminUrl = buildAdminUrl();
       const activeRequest = getActiveRequest();
       const thisScreenIsActive = activeRequest && activeRequest.screen === String(screen) && !activeRequest.handled;
 
       document.getElementById('modeLabel').textContent = 'Modo pantalla';
       document.getElementById('screenBadge').textContent = currentScreenLabel;
-      
 
       const title = document.getElementById('publicTitle');
       const subtitle = document.getElementById('publicSubtitle');
@@ -659,8 +642,8 @@
       document.getElementById('totalCount').textContent = requests.length;
       document.getElementById('adminUrlCode').textContent = buildAdminUrl();
       document.getElementById('queueBadge').textContent = `${pending} aviso${pending === 1 ? '' : 's'} pendientes`;
-      document.getElementById('vdoInfoCode').textContent = `P1: ${ZOOM_LINKS['1']} | P2: ${ZOOM_LINKS['2']}`;
-      document.getElementById('firebaseHelp').textContent = `1) Crea proyecto en Firebase\n2) Activa Firestore Database\n3) Pega tu configuración en FIREBASE_CONFIG\n4) Publica este HTML en tu web\n5) Abre ?admin=1 en recepción y ?p=1 / ?p=2 en las pantallas\n\nReglas rápidas de Firestore para probar:\nrules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    match /rooms/{roomId} {\n      allow read, write: if true;\n      match /requests/{requestId} {\n        allow read, write: if true;\n      }\n    }\n  }\n}`;
+      document.getElementById('vdoInfoCode').textContent = `P1: ${VDO_LINKS['1']} | P2: ${VDO_LINKS['2']}`;
+      document.getElementById('firebaseHelp').textContent = `Reglas rápidas de Firestore para probar:\nrules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    match /rooms/{roomId} {\n      allow read, write: if true;\n      match /requests/{requestId} {\n        allow read, write: if true;\n      }\n    }\n  }\n}`;
 
       const adminStatusBadge = document.getElementById('adminStatusBadge');
       if (activeRequest) {
@@ -688,7 +671,7 @@
 
       toggleAlarmBtn.textContent = `Alarma: ${state.autoAlarm ? 'ON' : 'OFF'}`;
       toggleAutoBusyBtn.textContent = `Auto ocupado: ${state.autoBusy ? 'ON' : 'OFF'}`;
-      toggleAutoVdoBtn.textContent = `Auto Zoom: ${state.autoVdo ? 'ON' : 'OFF'}`;
+      toggleAutoVdoBtn.textContent = `Auto VDO.Ninja: ${state.autoVdo ? 'ON' : 'OFF'}`;
       toggleAutoFreeBtn.textContent = `Auto disponible: ${state.autoFree ? 'ON' : 'OFF'}`;
 
       toggleAlarmBtn.className = state.autoAlarm ? 'btn btn-success btn-small' : 'btn btn-secondary btn-small';
@@ -721,7 +704,7 @@
           </div>
           <div class="request-actions">
             ${!item.handled && !isActive ? `<button class="btn btn-blue btn-small" data-action="activate" data-id="${item.id}" type="button">Atender esta</button>` : ''}
-            ${!item.handled ? `<button class="btn btn-warning btn-small" data-action="open-vdo" data-id="${item.id}" type="button">Abrir Zoom</button>` : ''}
+            ${!item.handled ? `<button class="btn btn-warning btn-small" data-action="open-vdo" data-id="${item.id}" type="button">Abrir VDO.Ninja</button>` : ''}
             ${!item.handled ? `<button class="btn btn-success btn-small" data-action="handle" data-id="${item.id}" type="button">Marcar gestionada</button>` : ''}
             <button class="btn btn-secondary btn-small" data-action="delete" data-id="${item.id}" type="button">Eliminar</button>
           </div>
@@ -790,7 +773,7 @@
       if (action === 'activate') await setActiveRequest(id);
       if (action === 'open-vdo' && request) {
         await setActiveRequest(id);
-        await openZoomForRequest(request);
+        await openVdoForRequest(request);
       }
     });
 
@@ -824,4 +807,4 @@
     initFirebase();
   </script>
 </body>
-</html>
+</html> necesito que en la pantalla 1 el qr salga un poco mas pequeño y la pantalla 2 si escaneas el qr salga en el movil un boton para unirse a zoom no entrar directamente
