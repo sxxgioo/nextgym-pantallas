@@ -250,7 +250,8 @@
         <aside class="qr-panel">
           <h2>Escanea para solicitar ayuda</h2>
           <div id="qrcode"></div>
-          
+          <p class="small" id="qrText"></p>
+          <p class="small"><strong>Panel interno:</strong><br><span id="adminUrlText"></span></p>
         </aside>
       </section>
 
@@ -595,7 +596,10 @@
       const activeRequest = getActiveRequest();
       const thisScreenIsActive = activeRequest && activeRequest.screen === String(screen) && !activeRequest.handled;
 
-      
+      document.getElementById('modeLabel').textContent = 'Modo pantalla';
+      document.getElementById('screenBadge').textContent = currentScreenLabel;
+      document.getElementById('qrText').textContent = publicUrl;
+      document.getElementById('adminUrlText').textContent = adminUrl;
 
       const title = document.getElementById('publicTitle');
       const subtitle = document.getElementById('publicSubtitle');
