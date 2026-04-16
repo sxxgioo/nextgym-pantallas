@@ -204,7 +204,6 @@
       word-break: break-all;
     }
     .switch-box { display: grid; gap: 14px; }
-    .config-box { white-space: pre-wrap; line-height: 1.45; }
     @media (max-width: 920px) {
       .screen-view, .grid, .stats-grid, .switch-grid { grid-template-columns: 1fr; }
       .title { font-size: 2rem; }
@@ -315,11 +314,6 @@
               <div class="auto-pill" id="autoSummaryBadge">Auto: manual</div>
             </div>
           </div>
-        </div>
-
-        <div class="info-box">
-          <h3>Configuración Firebase</h3>
-          <div class="muted config-box" id="firebaseHelp"></div>
         </div>
 
         <div class="tabs">
@@ -643,7 +637,6 @@
       document.getElementById('adminUrlCode').textContent = buildAdminUrl();
       document.getElementById('queueBadge').textContent = `${pending} aviso${pending === 1 ? '' : 's'} pendientes`;
       document.getElementById('vdoInfoCode').textContent = `P1: ${VDO_LINKS['1']} | P2: ${VDO_LINKS['2']}`;
-      document.getElementById('firebaseHelp').textContent = `Reglas rápidas de Firestore para probar:\nrules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    match /rooms/{roomId} {\n      allow read, write: if true;\n      match /requests/{requestId} {\n        allow read, write: if true;\n      }\n    }\n  }\n}`;
 
       const adminStatusBadge = document.getElementById('adminStatusBadge');
       if (activeRequest) {
@@ -729,7 +722,7 @@
     document.body.addEventListener('keydown', ensureAudioUnlocked, { once: true });
 
     document.getElementById('requestHelpButton').addEventListener('click', async () => {
-      const request = await addRequest(screen);
+      await addRequest(screen);
       alert(`Aviso enviado correctamente desde ${screenNames[screen] || `Pantalla ${screen}`}.`);
     });
 
@@ -779,7 +772,6 @@
 
     async function initFirebase() {
       if (!hasFirebaseConfig()) {
-        document.getElementById('firebaseHelp').textContent = 'Falta configurar Firebase. Pega tus claves en FIREBASE_CONFIG y vuelve a cargar la página.';
         render();
         return;
       }
@@ -807,4 +799,4 @@
     initFirebase();
   </script>
 </body>
-</html> 
+</html>
