@@ -92,7 +92,7 @@
       padding: 0;
       list-style: none;
     }
-    .steps li, .mini-card, .request-card, .stat-card, .info-box, .switch-box {
+    .steps li, .mini-card, .request-card, .stat-card, .switch-box {
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 16px;
@@ -147,7 +147,6 @@
     .hero-message.available { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.35); color: #dcfce7; }
     .hero-message.busy { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.35); color: #fee2e2; }
     .hero-message.attending { background: rgba(96,165,250,0.12); border: 1px solid rgba(96,165,250,0.35); color: #dbeafe; }
-    .footer { padding: 0 28px 28px; color: rgba(255,255,255,0.68); font-size: 0.9rem; line-height: 1.5; }
     .admin-view { padding: 28px; display: grid; gap: 22px; }
     .admin-top {
       display: flex;
@@ -158,8 +157,8 @@
     }
     .admin-title { margin: 0; font-size: 2rem; line-height: 1.1; }
     .admin-subtitle { margin: 8px 0 0; color: rgba(255,255,255,0.82); line-height: 1.55; max-width: 800px; }
-    .mini-card, .stat-card, .info-box, .request-card, .switch-box { padding: 18px; }
-    .mini-card h3, .stat-card h3, .info-box h3, .switch-box h3 { margin: 0 0 10px; font-size: 1rem; }
+    .mini-card, .stat-card, .request-card, .switch-box { padding: 18px; }
+    .mini-card h3, .stat-card h3, .switch-box h3 { margin: 0 0 10px; font-size: 1rem; }
     .stat-number { font-size: 2rem; font-weight: 800; margin-bottom: 6px; }
     .muted { color: rgba(255,255,255,0.68); }
     .request-card { display: grid; gap: 14px; }
@@ -236,7 +235,6 @@
 
           <div class="actions">
             <button id="requestHelpButton" class="btn btn-primary" type="button">Solicitar ayuda ahora</button>
-            <button id="copyLinkButton" class="btn btn-secondary" type="button">Copiar enlace</button>
           </div>
 
           <div class="hero-message available" id="publicMessage">Estamos disponibles. Tu solicitud se mostrará en el panel de recepción.</div>
@@ -322,8 +320,6 @@
         <div id="requestsList" class="requests-list"></div>
         <div id="emptyState" class="empty-state hidden">Todavía no hay solicitudes registradas.</div>
       </section>
-
-      <div class="footer">Importante: la apertura automática de VDO.Ninja y el sonido pueden ser bloqueados por el navegador hasta que hagas al menos un clic en el panel.</div>
     </main>
   </div>
 
@@ -721,18 +717,6 @@
     document.getElementById('requestHelpButton').addEventListener('click', async () => {
       await addRequest(screen);
       alert(`Aviso enviado correctamente desde ${screenNames[screen] || `Pantalla ${screen}`}.`);
-    });
-
-    document.getElementById('copyLinkButton').addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(buildPublicUrl(screen));
-        const btn = document.getElementById('copyLinkButton');
-        const original = btn.textContent;
-        btn.textContent = 'Enlace copiado';
-        setTimeout(() => btn.textContent = original, 1600);
-      } catch (_) {
-        alert('No se pudo copiar el enlace automáticamente.');
-      }
     });
 
     document.getElementById('setAvailableBtn')?.addEventListener('click', () => setAvailability(true));
