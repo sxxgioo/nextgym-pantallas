@@ -758,6 +758,21 @@
       });
     }
 
+    function applyRolePermissions() {
+      const isAdminRole = currentUserIsAdmin();
+      const clearAllBtn = document.getElementById('clearAllBtn');
+
+      if (!clearAllBtn) return;
+
+      if (isAdminRole) {
+        clearAllBtn.classList.remove('hidden');
+        clearAllBtn.disabled = false;
+      } else {
+        clearAllBtn.classList.add('hidden');
+        clearAllBtn.disabled = true;
+      }
+    }
+
     function setupUserCreation() {
       const form = document.getElementById('createUserForm');
       const msg = document.getElementById('usersMsg');
@@ -1054,13 +1069,14 @@
             ${!item.handled && !isActive ? `<button class="btn btn-blue btn-small" data-action="activate" data-id="${item.id}" type="button">Atender esta</button>` : ''}
             ${!item.handled ? `<button class="btn btn-warning btn-small" data-action="open-vdo" data-id="${item.id}" type="button">Abrir VDO.Ninja</button>` : ''}
             ${!item.handled ? `<button class="btn btn-success btn-small" data-action="handle" data-id="${item.id}" type="button">Marcar gestionada</button>` : ''}
-            <button class="btn btn-secondary btn-small" data-action="delete" data-id="${item.id}" type="button">Eliminar</button>
+            ${currentUserIsAdmin() ? `<button class="btn btn-secondary btn-small" data-action="delete" data-id="${item.id}" type="button">Eliminar</button>` : ''}
           </div>
         `;
         list.appendChild(card);
       });
 
       renderUsersPanel();
+      applyRolePermissions();
     }
 
     function render() {
@@ -1094,6 +1110,7 @@
     document.getElementById('setAvailableBtn')?.addEventListener('click', () => setAvailability(true));
     document.getElementById('setBusyBtn')?.addEventListener('click', () => setAvailability(false));
     document.getElementById('clearAllBtn')?.addEventListener('click', async () => {
+      if (!currentUserIsAdmin()) return;
       if (confirm('¿Seguro que quieres borrar todos los avisos?')) await clearAllRequests();
     });
     document.getElementById('toggleAlarmBtn')?.addEventListener('click', () => toggleFlag('autoAlarm'));
@@ -1113,14 +1130,29 @@
     document.getElementById('requestsList').addEventListener('click', async (event) => {
       const button = event.target.closest('button[data-action]');
       if (!button) return;
+
       const { action, id } = button.dataset;
       const request = requests.find((item) => item.id === id);
-      if (action === 'handle') await markHandled(id);
-      if (action === 'delete') await removeRequest(id);
-      if (action === 'activate') await setActiveRequest(id);
+
+      if (action === 'handle') {
+        await markHandled(id);
+        return;
+      }
+
+      if (action === 'activate') {
+        await setActiveRequest(id);
+        return;
+      }
+
       if (action === 'open-vdo' && request) {
         await setActiveRequest(id);
         await openVdoForRequest(request);
+        return;
+      }
+
+      if (action === 'delete') {
+        if (!currentUserIsAdmin()) return;
+        await removeRequest(id);
       }
     });
 
