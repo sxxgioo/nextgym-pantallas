@@ -422,7 +422,7 @@
           </div>
         </div>
 
-        <div class="users-box">
+        <div id="usersBox" class="users-box">
           <h3>Usuarios del panel interno</h3>
           <p class="muted">Solo los usuarios administradores pueden crear o eliminar usuarios.</p>
 
@@ -701,23 +701,25 @@
     }
 
     function renderUsersPanel() {
+      const usersBox = document.getElementById('usersBox');
       const usersList = document.getElementById('usersList');
       const usersMsg = document.getElementById('usersMsg');
       const createUserForm = document.getElementById('createUserForm');
-      const createUserBtn = document.getElementById('createUserBtn');
 
+      const isAdminRole = currentUserIsAdmin();
+
+      if (!isAdminRole) {
+        usersBox.classList.add('hidden');
+        return;
+      }
+
+      usersBox.classList.remove('hidden');
       usersList.innerHTML = '';
       usersMsg.textContent = '';
       usersMsg.className = 'users-msg';
+      createUserForm.classList.remove('hidden');
 
       const users = getUsers();
-      const isAdminRole = currentUserIsAdmin();
-
-      createUserForm.classList.toggle('hidden', !isAdminRole);
-      if (!isAdminRole) {
-        usersMsg.textContent = 'Tu usuario no tiene permisos de administrador.';
-        usersMsg.className = 'users-msg error';
-      }
 
       users.forEach(user => {
         const item = document.createElement('div');
@@ -728,7 +730,7 @@
             <div class="muted">${user.role === 'admin' ? '<span class="pill-admin">Administrador</span>' : 'Usuario estándar'}</div>
           </div>
           <div class="user-row">
-            ${isAdminRole && user.email !== 'sergio.santidrian@nextgym.es'
+            ${user.email !== 'sergio.santidrian@nextgym.es'
               ? `<button class="btn btn-danger btn-small" data-action="delete-user" data-email="${user.email}" type="button">Eliminar</button>`
               : ''}
           </div>
