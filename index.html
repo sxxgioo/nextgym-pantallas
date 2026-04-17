@@ -58,7 +58,7 @@
       padding: 32px 28px 36px;
       align-items: center;
     }
-    .badge-row, .status-row, .admin-toolbar, .switch-actions {
+    .badge-row, .status-row, .admin-toolbar, .switch-actions, .user-row {
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
@@ -77,6 +77,7 @@
     .status-badge.available { background: rgba(34,197,94,0.16); color: #bbf7d0; border-color: rgba(34,197,94,0.4); }
     .status-badge.busy { background: rgba(239,68,68,0.16); color: #fecaca; border-color: rgba(239,68,68,0.35); }
     .status-badge.attending { background: rgba(96,165,250,0.16); color: #dbeafe; border-color: rgba(96,165,250,0.35); }
+
     .title { font-size: 2.5rem; line-height: 1.08; margin: 18px 0 14px; }
     .subtitle {
       font-size: 1.12rem;
@@ -92,7 +93,7 @@
       padding: 0;
       list-style: none;
     }
-    .steps li, .mini-card, .request-card, .stat-card, .switch-box {
+    .steps li, .mini-card, .request-card, .stat-card, .switch-box, .users-box {
       background: rgba(255,255,255,0.06);
       border: 1px solid rgba(255,255,255,0.08);
       border-radius: 16px;
@@ -106,6 +107,7 @@
     .grid { grid-template-columns: 1fr 1fr; }
     .stats-grid { grid-template-columns: repeat(3, 1fr); }
     .switch-grid { grid-template-columns: 1fr 1fr; }
+
     .btn {
       appearance: none;
       border: 0;
@@ -128,6 +130,7 @@
     .btn-warning { background: var(--yellow); color: var(--black); }
     .btn-blue { background: var(--blue); color: var(--black); }
     .btn-small { padding: 10px 14px; min-height: auto; font-size: 0.92rem; }
+
     .qr-panel {
       background: var(--white);
       color: var(--black);
@@ -138,6 +141,7 @@
     }
     .qr-panel h2 { font-size: 1.15rem; margin: 0 0 14px; }
     #qrcode { display: flex; justify-content: center; margin: 12px 0 14px; }
+
     .hero-message {
       margin-top: 18px;
       padding: 16px 18px;
@@ -147,6 +151,7 @@
     .hero-message.available { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.35); color: #dcfce7; }
     .hero-message.busy { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.35); color: #fee2e2; }
     .hero-message.attending { background: rgba(96,165,250,0.12); border: 1px solid rgba(96,165,250,0.35); color: #dbeafe; }
+
     .admin-view { padding: 28px; display: grid; gap: 22px; }
     .admin-top {
       display: flex;
@@ -157,10 +162,11 @@
     }
     .admin-title { margin: 0; font-size: 2rem; line-height: 1.1; }
     .admin-subtitle { margin: 8px 0 0; color: rgba(255,255,255,0.82); line-height: 1.55; max-width: 800px; }
-    .mini-card, .stat-card, .request-card, .switch-box { padding: 18px; }
-    .mini-card h3, .stat-card h3, .switch-box h3 { margin: 0 0 10px; font-size: 1rem; }
+    .mini-card, .stat-card, .request-card, .switch-box, .users-box { padding: 18px; }
+    .mini-card h3, .stat-card h3, .switch-box h3, .users-box h3 { margin: 0 0 10px; font-size: 1rem; }
     .stat-number { font-size: 2rem; font-weight: 800; margin-bottom: 6px; }
     .muted { color: rgba(255,255,255,0.68); }
+
     .request-card { display: grid; gap: 14px; }
     .request-head {
       display: flex;
@@ -172,6 +178,7 @@
     .request-title { margin: 0; font-size: 1.12rem; }
     .request-meta { color: rgba(255,255,255,0.76); font-size: 0.95rem; line-height: 1.45; }
     .request-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
     .tabs { display: flex; gap: 10px; flex-wrap: wrap; }
     .tab {
       border: 1px solid rgba(255,255,255,0.14);
@@ -183,7 +190,9 @@
       cursor: pointer;
     }
     .tab.active { background: var(--orange); color: var(--black); border-color: transparent; }
+
     .hidden { display: none !important; }
+
     .empty-state {
       padding: 26px;
       text-align: center;
@@ -191,6 +200,7 @@
       border: 1px dashed rgba(255,255,255,0.16);
       border-radius: 18px;
     }
+
     .code {
       font-family: Consolas, Monaco, monospace;
       font-size: 0.92rem;
@@ -201,7 +211,93 @@
       display: inline-block;
       word-break: break-all;
     }
-    .switch-box { display: grid; gap: 14px; }
+    .switch-box, .users-box { display: grid; gap: 14px; }
+
+    .admin-login-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.84);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 9999;
+    }
+    .admin-login-box {
+      width: 100%;
+      max-width: 430px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      padding: 28px;
+    }
+    .admin-login-box h2 {
+      margin: 0 0 10px;
+      font-size: 1.8rem;
+    }
+    .admin-login-box p {
+      margin: 0 0 18px;
+      color: rgba(255,255,255,0.78);
+      line-height: 1.5;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 12px;
+    }
+    .form-grid input, .form-grid select {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.08);
+      color: var(--white);
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 1rem;
+      outline: none;
+    }
+    .form-grid input::placeholder {
+      color: rgba(255,255,255,0.5);
+    }
+    .login-error, .users-msg {
+      min-height: 20px;
+      font-size: 0.95rem;
+    }
+    .login-error { color: #fecaca; }
+    .users-msg.success { color: #bbf7d0; }
+    .users-msg.error { color: #fecaca; }
+
+    .users-list {
+      display: grid;
+      gap: 10px;
+    }
+    .user-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .user-item strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+    .pill-admin {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      background: rgba(255,122,0,0.18);
+      color: #ffd5ae;
+      border: 1px solid rgba(255,122,0,0.35);
+    }
+
     @media (max-width: 920px) {
       .screen-view, .grid, .stats-grid, .switch-grid { grid-template-columns: 1fr; }
       .title { font-size: 2rem; }
@@ -210,6 +306,19 @@
   </style>
 </head>
 <body>
+  <div id="adminLoginOverlay" class="admin-login-overlay hidden">
+    <div class="admin-login-box">
+      <h2>Acceso panel interno</h2>
+      <p>Introduce tu usuario y contraseña para acceder al panel interno.</p>
+      <form id="adminLoginForm" class="form-grid">
+        <input id="adminUsername" type="text" placeholder="Usuario" autocomplete="username" />
+        <input id="adminPassword" type="password" placeholder="Contraseña" autocomplete="current-password" />
+        <button type="submit" class="btn btn-primary">Entrar</button>
+        <div id="loginError" class="login-error"></div>
+      </form>
+    </div>
+  </div>
+
   <div class="app">
     <main class="panel">
       <div class="header">
@@ -256,6 +365,7 @@
             <button id="setAvailableBtn" class="btn btn-success btn-small" type="button">Marcar disponible</button>
             <button id="setBusyBtn" class="btn btn-danger btn-small" type="button">Marcar no disponible</button>
             <button id="clearAllBtn" class="btn btn-secondary btn-small" type="button">Vaciar avisos</button>
+            <button id="logoutBtn" class="btn btn-secondary btn-small" type="button">Cerrar sesión</button>
           </div>
         </div>
 
@@ -288,6 +398,7 @@
             </div>
             <p class="muted">“Auto disponible” vuelve a disponible al marcar gestionada la solicitud activa.</p>
           </div>
+
           <div class="switch-box">
             <h3>Enlaces VDO.Ninja</h3>
             <p class="muted">Configura la sala que debe abrirse al llegar una solicitud.</p>
@@ -309,6 +420,24 @@
               <div class="auto-pill" id="autoSummaryBadge">Auto: manual</div>
             </div>
           </div>
+        </div>
+
+        <div class="users-box">
+          <h3>Usuarios del panel interno</h3>
+          <p class="muted">Solo los usuarios administradores pueden crear o eliminar usuarios.</p>
+
+          <form id="createUserForm" class="form-grid">
+            <input id="newUserEmail" type="email" placeholder="Correo del usuario" />
+            <input id="newUserPassword" type="text" placeholder="Contraseña" />
+            <select id="newUserRole">
+              <option value="user">Usuario</option>
+              <option value="admin">Administrador</option>
+            </select>
+            <button id="createUserBtn" class="btn btn-primary" type="submit">Crear usuario</button>
+            <div id="usersMsg" class="users-msg"></div>
+          </form>
+
+          <div id="usersList" class="users-list"></div>
         </div>
 
         <div class="tabs">
@@ -358,6 +487,17 @@
       '1': 'https://vdo.ninja/?room=nextgym1&director=1',
       '2': 'https://vdo.ninja/?room=nextgym2&director=1'
     };
+
+    const USERS_STORAGE_KEY = 'nextgym_admin_users';
+    const ADMIN_SESSION_KEY = 'nextgym_admin_auth';
+
+    const DEFAULT_USERS = [
+      {
+        email: 'sergio.santidrian@nextgym.es',
+        password: '@Oigres150303',
+        role: 'admin'
+      }
+    ];
 
     const params = new URLSearchParams(window.location.search);
     const isAdmin = params.get('admin') === '1';
@@ -448,6 +588,207 @@
         oscillator.start();
         oscillator.stop(ctx.currentTime + 0.36);
       } catch (_) {}
+    }
+
+    function seedUsersIfNeeded() {
+      const existing = localStorage.getItem(USERS_STORAGE_KEY);
+      if (!existing) {
+        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(DEFAULT_USERS));
+        return;
+      }
+
+      try {
+        const users = JSON.parse(existing);
+        const hasMainAdmin = users.some(u => u.email === DEFAULT_USERS[0].email);
+        if (!hasMainAdmin) {
+          users.push(DEFAULT_USERS[0]);
+          localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+        }
+      } catch (_) {
+        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(DEFAULT_USERS));
+      }
+    }
+
+    function getUsers() {
+      seedUsersIfNeeded();
+      try {
+        return JSON.parse(localStorage.getItem(USERS_STORAGE_KEY)) || [];
+      } catch (_) {
+        return [...DEFAULT_USERS];
+      }
+    }
+
+    function saveUsers(users) {
+      localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+    }
+
+    function findUserByEmail(email) {
+      return getUsers().find(u => u.email.toLowerCase() === String(email).toLowerCase());
+    }
+
+    function setCurrentSession(user) {
+      sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify({
+        email: user.email,
+        role: user.role
+      }));
+    }
+
+    function getCurrentSession() {
+      try {
+        return JSON.parse(sessionStorage.getItem(ADMIN_SESSION_KEY));
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function isAdminAuthenticated() {
+      return !!getCurrentSession();
+    }
+
+    function currentUserIsAdmin() {
+      return getCurrentSession()?.role === 'admin';
+    }
+
+    function showAdminLogin() {
+      document.getElementById('adminLoginOverlay').classList.remove('hidden');
+    }
+
+    function hideAdminLogin() {
+      document.getElementById('adminLoginOverlay').classList.add('hidden');
+    }
+
+    function logoutAdmin() {
+      sessionStorage.removeItem(ADMIN_SESSION_KEY);
+      showAdminLogin();
+      document.getElementById('adminView').classList.add('hidden');
+    }
+
+    function setupAdminLogin() {
+      if (!isAdmin) return;
+
+      seedUsersIfNeeded();
+
+      const form = document.getElementById('adminLoginForm');
+      const usernameInput = document.getElementById('adminUsername');
+      const passwordInput = document.getElementById('adminPassword');
+      const errorBox = document.getElementById('loginError');
+
+      if (!isAdminAuthenticated()) {
+        showAdminLogin();
+      } else {
+        hideAdminLogin();
+      }
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        errorBox.textContent = '';
+
+        const email = usernameInput.value.trim();
+        const password = passwordInput.value;
+        const user = findUserByEmail(email);
+
+        if (!user || user.password !== password) {
+          errorBox.textContent = 'Usuario o contraseña incorrectos.';
+          return;
+        }
+
+        setCurrentSession(user);
+        hideAdminLogin();
+        usernameInput.value = '';
+        passwordInput.value = '';
+        render();
+      });
+    }
+
+    function renderUsersPanel() {
+      const usersList = document.getElementById('usersList');
+      const usersMsg = document.getElementById('usersMsg');
+      const createUserForm = document.getElementById('createUserForm');
+      const createUserBtn = document.getElementById('createUserBtn');
+
+      usersList.innerHTML = '';
+      usersMsg.textContent = '';
+      usersMsg.className = 'users-msg';
+
+      const users = getUsers();
+      const isAdminRole = currentUserIsAdmin();
+
+      createUserForm.classList.toggle('hidden', !isAdminRole);
+      if (!isAdminRole) {
+        usersMsg.textContent = 'Tu usuario no tiene permisos de administrador.';
+        usersMsg.className = 'users-msg error';
+      }
+
+      users.forEach(user => {
+        const item = document.createElement('div');
+        item.className = 'user-item';
+        item.innerHTML = `
+          <div>
+            <strong>${user.email}</strong>
+            <div class="muted">${user.role === 'admin' ? '<span class="pill-admin">Administrador</span>' : 'Usuario estándar'}</div>
+          </div>
+          <div class="user-row">
+            ${isAdminRole && user.email !== 'sergio.santidrian@nextgym.es'
+              ? `<button class="btn btn-danger btn-small" data-action="delete-user" data-email="${user.email}" type="button">Eliminar</button>`
+              : ''}
+          </div>
+        `;
+        usersList.appendChild(item);
+      });
+    }
+
+    function setupUserCreation() {
+      const form = document.getElementById('createUserForm');
+      const msg = document.getElementById('usersMsg');
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        msg.textContent = '';
+        msg.className = 'users-msg';
+
+        if (!currentUserIsAdmin()) {
+          msg.textContent = 'No tienes permisos para crear usuarios.';
+          msg.className = 'users-msg error';
+          return;
+        }
+
+        const email = document.getElementById('newUserEmail').value.trim().toLowerCase();
+        const password = document.getElementById('newUserPassword').value.trim();
+        const role = document.getElementById('newUserRole').value;
+
+        if (!email || !password) {
+          msg.textContent = 'Debes rellenar correo y contraseña.';
+          msg.className = 'users-msg error';
+          return;
+        }
+
+        const users = getUsers();
+        if (users.some(u => u.email.toLowerCase() === email)) {
+          msg.textContent = 'Ese usuario ya existe.';
+          msg.className = 'users-msg error';
+          return;
+        }
+
+        users.push({ email, password, role });
+        saveUsers(users);
+
+        form.reset();
+        msg.textContent = 'Usuario creado correctamente.';
+        msg.className = 'users-msg success';
+        renderUsersPanel();
+      });
+
+      document.getElementById('usersList').addEventListener('click', (event) => {
+        const btn = event.target.closest('button[data-action="delete-user"]');
+        if (!btn) return;
+
+        if (!currentUserIsAdmin()) return;
+
+        const email = btn.dataset.email;
+        const users = getUsers().filter(u => u.email !== email);
+        saveUsers(users);
+        renderUsersPanel();
+      });
     }
 
     async function openVdoForRequest(request) {
@@ -697,10 +1038,20 @@
         `;
         list.appendChild(card);
       });
+
+      renderUsersPanel();
     }
 
     function render() {
       if (isAdmin) {
+        if (!isAdminAuthenticated()) {
+          document.getElementById('screenView').classList.add('hidden');
+          document.getElementById('adminView').classList.add('hidden');
+          showAdminLogin();
+          return;
+        }
+
+        hideAdminLogin();
         document.getElementById('screenView').classList.add('hidden');
         document.getElementById('adminView').classList.remove('hidden');
         renderAdmin();
@@ -728,6 +1079,7 @@
     document.getElementById('toggleAutoBusyBtn')?.addEventListener('click', () => toggleFlag('autoBusy'));
     document.getElementById('toggleAutoVdoBtn')?.addEventListener('click', () => toggleFlag('autoVdo'));
     document.getElementById('toggleAutoFreeBtn')?.addEventListener('click', () => toggleFlag('autoFree'));
+    document.getElementById('logoutBtn')?.addEventListener('click', logoutAdmin);
 
     document.querySelectorAll('.tab').forEach((tab) => {
       tab.addEventListener('click', () => {
@@ -776,6 +1128,9 @@
       });
     }
 
+    seedUsersIfNeeded();
+    setupAdminLogin();
+    setupUserCreation();
     render();
     initFirebase();
   </script>
