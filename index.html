@@ -496,6 +496,16 @@
         email: 'sergio.santidrian@nextgym.es',
         password: '@Oigres150303',
         role: 'admin'
+      },
+      {
+        email: 'alicia.lara@nextgym.es',
+        password: 'NoLimits2026',
+        role: 'user'
+      },
+      {
+        email: 'veronica.linares@nextgym.es',
+        password: 'NoLimits2026',
+        role: 'user'
       }
     ];
 
@@ -594,13 +604,7 @@
       const resetUsers = false;
 
       if (resetUsers) {
-        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify([
-          {
-            email: 'sergio.santidrian@nextgym.es',
-            password: '@Oigres150303',
-            role: 'admin'
-          }
-        ]));
+        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(DEFAULT_USERS));
         return;
       }
 
