@@ -213,6 +213,18 @@
     }
     .switch-box, .users-box { display: grid; gap: 14px; }
 
+    .direct-link {
+      color: #ffd5ae;
+      text-decoration: none;
+      word-break: break-all;
+      line-height: 1.5;
+      display: inline-block;
+      margin-top: 6px;
+    }
+    .direct-link:hover {
+      text-decoration: underline;
+    }
+
     .admin-login-overlay {
       position: fixed;
       inset: 0;
@@ -419,6 +431,27 @@
               <div class="queue-pill" id="queueBadge">0 avisos pendientes</div>
               <div class="auto-pill" id="autoSummaryBadge">Auto: manual</div>
             </div>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="mini-card">
+            <h3>Enlaces directos pantallas</h3>
+            <p class="muted">Acceso rápido a cada pantalla pública.</p>
+            <div class="form-grid">
+              <div>
+                <strong>Sala Alcobendas</strong><br>
+                <a id="screen1DirectLink" class="direct-link" href="#" target="_blank" rel="noopener noreferrer"></a>
+              </div>
+              <div>
+                <strong>Recepción Alcobendas</strong><br>
+                <a id="screen2DirectLink" class="direct-link" href="#" target="_blank" rel="noopener noreferrer"></a>
+              </div>
+            </div>
+          </div>
+          <div class="mini-card">
+            <h3>Acceso rápido por QR</h3>
+            <p class="muted">Puedes abrir cada enlace directamente desde este panel interno.</p>
           </div>
         </div>
 
@@ -773,6 +806,24 @@
       }
     }
 
+    function renderDirectLinks() {
+      const screen1 = buildPublicUrl('1');
+      const screen2 = buildPublicUrl('2');
+
+      const screen1El = document.getElementById('screen1DirectLink');
+      const screen2El = document.getElementById('screen2DirectLink');
+
+      if (screen1El) {
+        screen1El.href = screen1;
+        screen1El.textContent = screen1;
+      }
+
+      if (screen2El) {
+        screen2El.href = screen2;
+        screen2El.textContent = screen2;
+      }
+    }
+
     function setupUserCreation() {
       const form = document.getElementById('createUserForm');
       const msg = document.getElementById('usersMsg');
@@ -1077,6 +1128,7 @@
 
       renderUsersPanel();
       applyRolePermissions();
+      renderDirectLinks();
     }
 
     function render() {
