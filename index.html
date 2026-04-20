@@ -1,215 +1,1526 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Next Gym</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Next Gym · Atención al socio</title>
+  <style>
+    :root {
+      --orange: #ff7a00;
+      --black: #111111;
+      --white: #ffffff;
+      --green: #22c55e;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --blue: #60a5fa;
+      --card: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.12);
+      --shadow: 0 20px 50px rgba(0,0,0,0.35);
+    }
 
-<style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:#111;
-  color:#fff;
-}
-.header{
-  background:#ff7a00;
-  padding:15px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  color:#000;
-}
-.logo{
-  height:40px;
-  display:none;
-}
-.panel{padding:20px;}
-.hidden{display:none;}
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #111111 0%, #1f1f1f 100%);
+      color: var(--white);
+    }
+    body { min-height: 100vh; padding: 24px; }
+    .app { width: 100%; max-width: 1180px; margin: 0 auto; }
+    .panel {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+    .header {
+      padding: 22px 28px;
+      background: linear-gradient(90deg, var(--orange), #ff9e45);
+      color: var(--black);
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .header small { font-size: 0.8rem; font-weight: 700; opacity: 0.85; }
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    #logoImg {
+      height: 42px;
+      max-width: 180px;
+      object-fit: contain;
+      display: none;
+      border-radius: 8px;
+      background: transparent;
+    }
 
-.btn{
-  padding:10px;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-  font-weight:bold;
-}
-.btn-primary{background:#ff7a00;color:#000;}
-.btn-danger{background:red;color:#fff;}
-.btn-secondary{background:#333;color:#fff;}
+    .screen-view {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 28px;
+      padding: 32px 28px 36px;
+      align-items: center;
+    }
+    .badge-row, .status-row, .admin-toolbar, .switch-actions, .user-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .screen-badge, .status-badge, .queue-pill, .auto-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-weight: 700;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.08);
+    }
+    .status-badge.available { background: rgba(34,197,94,0.16); color: #bbf7d0; border-color: rgba(34,197,94,0.4); }
+    .status-badge.busy { background: rgba(239,68,68,0.16); color: #fecaca; border-color: rgba(239,68,68,0.35); }
+    .status-badge.attending { background: rgba(96,165,250,0.16); color: #dbeafe; border-color: rgba(96,165,250,0.35); }
 
-input{
-  padding:10px;
-  border-radius:8px;
-  border:none;
-  width:100%;
-}
-</style>
+    .title { font-size: 2.5rem; line-height: 1.08; margin: 18px 0 14px; }
+    .subtitle {
+      font-size: 1.12rem;
+      line-height: 1.65;
+      color: rgba(255,255,255,0.9);
+      margin: 0 0 22px;
+      max-width: 700px;
+    }
+    .steps {
+      display: grid;
+      gap: 10px;
+      margin: 0 0 26px;
+      padding: 0;
+      list-style: none;
+    }
+    .steps li, .mini-card, .request-card, .stat-card, .switch-box, .users-box {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+    }
+    .steps li { padding: 14px 16px; line-height: 1.45; }
+    .actions, .grid, .stats-grid, .requests-list, .switch-grid {
+      display: grid;
+      gap: 14px;
+    }
+    .actions { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .grid { grid-template-columns: 1fr 1fr; }
+    .stats-grid { grid-template-columns: repeat(3, 1fr); }
+    .switch-grid { grid-template-columns: 1fr 1fr; }
+
+    .btn {
+      appearance: none;
+      border: 0;
+      border-radius: 14px;
+      padding: 16px 18px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.15s ease, opacity 0.15s ease, filter 0.15s ease;
+      min-height: 54px;
+    }
+    .btn:hover { transform: translateY(-1px); filter: brightness(1.03); }
+    .btn:active { transform: translateY(0); }
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; filter: none; }
+    .btn-primary { background: var(--orange); color: var(--black); }
+    .btn-secondary { background: transparent; color: var(--white); border: 1px solid rgba(255,255,255,0.2); }
+    .btn-success { background: var(--green); color: var(--black); }
+    .btn-danger { background: var(--red); color: var(--white); }
+    .btn-warning { background: var(--yellow); color: var(--black); }
+    .btn-blue { background: var(--blue); color: var(--black); }
+    .btn-small { padding: 10px 14px; min-height: auto; font-size: 0.92rem; }
+
+    .qr-panel {
+      background: var(--white);
+      color: var(--black);
+      border-radius: 24px;
+      padding: 22px;
+      text-align: center;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.06);
+    }
+    .qr-panel h2 { font-size: 1.15rem; margin: 0 0 14px; }
+    #qrcode { display: flex; justify-content: center; margin: 12px 0 14px; }
+
+    .hero-message {
+      margin-top: 18px;
+      padding: 16px 18px;
+      border-radius: 16px;
+      line-height: 1.5;
+    }
+    .hero-message.available { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.35); color: #dcfce7; }
+    .hero-message.busy { background: rgba(239,68,68,0.12); border: 1px solid rgba(239,68,68,0.35); color: #fee2e2; }
+    .hero-message.attending { background: rgba(96,165,250,0.12); border: 1px solid rgba(96,165,250,0.35); color: #dbeafe; }
+
+    .admin-view { padding: 28px; display: grid; gap: 22px; }
+    .admin-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .admin-title { margin: 0; font-size: 2rem; line-height: 1.1; }
+    .admin-subtitle { margin: 8px 0 0; color: rgba(255,255,255,0.82); line-height: 1.55; max-width: 800px; }
+    .mini-card, .stat-card, .request-card, .switch-box, .users-box { padding: 18px; }
+    .mini-card h3, .stat-card h3, .switch-box h3, .users-box h3 { margin: 0; font-size: 1rem; }
+    .stat-number { font-size: 2rem; font-weight: 800; margin-bottom: 6px; }
+    .muted { color: rgba(255,255,255,0.68); }
+
+    .request-card { display: grid; gap: 14px; }
+    .request-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .request-title { margin: 0; font-size: 1.12rem; }
+    .request-meta { color: rgba(255,255,255,0.76); font-size: 0.95rem; line-height: 1.45; }
+    .request-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    .tabs { display: flex; gap: 10px; flex-wrap: wrap; }
+    .tab {
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      color: var(--white);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .tab.active { background: var(--orange); color: var(--black); border-color: transparent; }
+
+    .hidden { display: none !important; }
+
+    .empty-state {
+      padding: 26px;
+      text-align: center;
+      color: rgba(255,255,255,0.76);
+      border: 1px dashed rgba(255,255,255,0.16);
+      border-radius: 18px;
+    }
+
+    .code {
+      font-family: Consolas, Monaco, monospace;
+      font-size: 0.92rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 10px 12px;
+      border-radius: 12px;
+      display: inline-block;
+      word-break: break-all;
+      white-space: pre-wrap;
+    }
+    .switch-box, .users-box { display: grid; gap: 14px; }
+
+    .direct-link {
+      color: #ffd5ae;
+      text-decoration: none;
+      word-break: break-all;
+      line-height: 1.5;
+      display: inline-block;
+      margin-top: 6px;
+    }
+    .direct-link:hover {
+      text-decoration: underline;
+    }
+
+    .section-card {
+      position: relative;
+    }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .toggle-visibility-btn {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.08);
+      color: var(--white);
+      border-radius: 12px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+    }
+    .toggle-visibility-btn:hover {
+      background: rgba(255,255,255,0.14);
+    }
+    .section-body.hidden-section {
+      display: none;
+    }
+
+    .logo-preview {
+      max-height: 80px;
+      max-width: 220px;
+      display: none;
+      object-fit: contain;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.04);
+      padding: 6px;
+    }
+
+    .admin-login-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.84);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 9999;
+    }
+    .admin-login-box {
+      width: 100%;
+      max-width: 430px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      padding: 28px;
+    }
+    .admin-login-box h2 {
+      margin: 0 0 10px;
+      font-size: 1.8rem;
+    }
+    .admin-login-box p {
+      margin: 0 0 18px;
+      color: rgba(255,255,255,0.78);
+      line-height: 1.5;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 12px;
+    }
+    .form-grid input, .form-grid select {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.08);
+      color: var(--white);
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 1rem;
+      outline: none;
+    }
+    .form-grid input::placeholder {
+      color: rgba(255,255,255,0.5);
+    }
+    .login-error, .users-msg {
+      min-height: 20px;
+      font-size: 0.95rem;
+    }
+    .login-error { color: #fecaca; }
+    .users-msg.success { color: #bbf7d0; }
+    .users-msg.error { color: #fecaca; }
+
+    .users-list {
+      display: grid;
+      gap: 10px;
+    }
+    .user-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .user-item strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+    .pill-admin {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      background: rgba(255,122,0,0.18);
+      color: #ffd5ae;
+      border: 1px solid rgba(255,122,0,0.35);
+    }
+
+    @media (max-width: 920px) {
+      .screen-view, .grid, .stats-grid, .switch-grid { grid-template-columns: 1fr; }
+      .title { font-size: 2rem; }
+      .admin-title { font-size: 1.65rem; }
+    }
+  </style>
 </head>
-
 <body>
-
-<div class="header">
-  <div>
-    <img id="logo" class="logo">
-    Next Gym
-  </div>
-  <span id="mode"></span>
-</div>
-
-<div id="login" class="panel hidden">
-  <h2>Login</h2>
-  <input id="user" placeholder="usuario">
-  <br><br>
-  <input id="pass" type="password" placeholder="contraseña">
-  <br><br>
-  <button onclick="login()" class="btn btn-primary">Entrar</button>
-</div>
-
-<div id="screen" class="panel">
-  <h1>¿Necesitas ayuda?</h1>
-  <button class="btn btn-primary" onclick="send()">Solicitar ayuda</button>
-</div>
-
-<div id="admin" class="panel hidden">
-
-  <h2>Panel interno</h2>
-
-  <button class="btn btn-primary" onclick="setAvailable()">Disponible</button>
-  <button class="btn btn-danger" onclick="setBusy()">No disponible</button>
-
-  <hr>
-
-  <h3>Enlaces pantallas</h3>
-  <a id="link1" target="_blank"></a><br>
-  <a id="link2" target="_blank"></a>
-
-  <hr>
-
-  <h3>Logo</h3>
-  <input type="file" id="logoFile">
-  <button onclick="saveLogo()" class="btn btn-primary">Guardar logo</button>
-
-  <hr>
-
-  <div id="usersBox">
-    <h3>Usuarios</h3>
-    <input id="newUser" placeholder="email">
-    <input id="newPass" placeholder="password">
-    <button onclick="createUser()" class="btn btn-primary">Crear</button>
+  <div id="adminLoginOverlay" class="admin-login-overlay hidden">
+    <div class="admin-login-box">
+      <h2>Acceso panel interno</h2>
+      <p>Introduce tu usuario y contraseña para acceder al panel interno.</p>
+      <form id="adminLoginForm" class="form-grid">
+        <input id="adminUsername" type="text" placeholder="Usuario" autocomplete="username" />
+        <input id="adminPassword" type="password" placeholder="Contraseña" autocomplete="current-password" />
+        <button type="submit" class="btn btn-primary">Entrar</button>
+        <div id="loginError" class="login-error"></div>
+      </form>
+    </div>
   </div>
 
-</div>
+  <div class="app">
+    <main class="panel">
+      <div class="header">
+        <div class="brand-wrap">
+          <img id="logoImg" src="" alt="Logo Next Gym" />
+          <span>Next Gym · Atención al socio</span>
+        </div>
+        <small id="modeLabel">Modo pantalla</small>
+      </div>
 
-<script type="module">
+      <section id="screenView" class="screen-view">
+        <div>
+          <div class="badge-row">
+            <div class="screen-badge" id="screenBadge">Sala Alcobendas</div>
+            <div class="status-badge available" id="publicStatusBadge">Disponible</div>
+          </div>
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+          <h1 class="title" id="publicTitle">¿Necesitas ayuda?</h1>
+          <p class="subtitle" id="publicSubtitle">Escanea el código QR con tu móvil para avisar a recepción. Si estamos disponibles, tu solicitud entrará al instante.</p>
 
-const app = initializeApp({
-  apiKey: "AIzaSyB_C4gc8esz6wNIiW17Ig0I9oRtNr1g_bE",
-  authDomain: "nextgym-402e3.firebaseapp.com",
-  projectId: "nextgym-402e3"
-});
+          <ul class="steps">
+            <li><strong>1.</strong> Escanea el código QR con tu móvil.</li>
+            <li><strong>2.</strong> Se abrirá esta web en tu teléfono.</li>
+            <li><strong>3.</strong> Pulsa el botón para solicitar atención.</li>
+          </ul>
 
-const db = getFirestore(app);
-const roomRef = doc(db,"rooms","nextgym");
+          <div class="actions">
+            <button id="requestHelpButton" class="btn btn-primary" type="button">Solicitar ayuda ahora</button>
+          </div>
 
-const params = new URLSearchParams(location.search);
-const isAdmin = params.get("admin") === "1";
+          <div class="hero-message available" id="publicMessage">Estamos disponibles. Tu solicitud se mostrará en el panel de recepción.</div>
+        </div>
 
-const VDO_LINKS = {
-  '1': 'https://vdo.ninja/?director=Recepcion_Next_Gym_Alcobendas&password=NoLimits2026&push=fZG4QSq',
-  '2': 'https://vdo.ninja/?director=Recepcion_Next_Gym_Alcobendas&password=NoLimits2026&push=fZG4QSq'
-};
+        <aside class="qr-panel">
+          <h2>Escanea para solicitar ayuda</h2>
+          <div id="qrcode"></div>
+        </aside>
+      </section>
 
-const USERS = [
-  {u:"sergio.santidrian@nextgym.es",p:"@Oigres150303",role:"admin"},
-  {u:"alicia.lara@nextgym.es",p:"NoLimits2026",role:"user"},
-  {u:"veronica.linares@nextgym.es",p:"NoLimits2026",role:"user"}
-];
+      <section id="adminView" class="admin-view hidden">
+        <div class="admin-top">
+          <div>
+            <h1 class="admin-title">Panel interno de avisos</h1>
+            <p class="admin-subtitle">Desde aquí puedes marcar si estáis disponibles o no, ver las solicitudes en tiempo real y activar automatizaciones para la alarma, VDO.Ninja y el modo ocupado.</p>
+          </div>
+          <div class="admin-toolbar">
+            <button id="setAvailableBtn" class="btn btn-success btn-small" type="button">Marcar disponible</button>
+            <button id="setBusyBtn" class="btn btn-danger btn-small" type="button">Marcar no disponible</button>
+            <button id="clearAllBtn" class="btn btn-secondary btn-small" type="button">Vaciar avisos</button>
+            <button id="logoutBtn" class="btn btn-secondary btn-small" type="button">Cerrar sesión</button>
+          </div>
+        </div>
 
-let currentUser=null;
+        <div class="stats-grid">
+          <div class="stat-card section-card">
+            <div class="section-head">
+              <h3>Estado actual</h3>
+              <button class="toggle-visibility-btn" type="button" data-target="estadoActualBody">👁</button>
+            </div>
+            <div class="section-body" id="estadoActualBody">
+              <div class="stat-number" id="statusSummary">Disponible</div>
+              <div class="muted">Este estado se refleja en las pantallas públicas.</div>
+            </div>
+          </div>
 
-document.getElementById("mode").innerText = isAdmin ? "ADMIN" : "PANTALLA";
+          <div class="stat-card section-card">
+            <div class="section-head">
+              <h3>Solicitudes pendientes</h3>
+              <button class="toggle-visibility-btn" type="button" data-target="solicitudesPendientesBody">👁</button>
+            </div>
+            <div class="section-body" id="solicitudesPendientesBody">
+              <div class="stat-number" id="pendingCount">0</div>
+              <div class="muted">Avisos aún sin gestionar.</div>
+            </div>
+          </div>
 
-if(isAdmin){
-  document.getElementById("screen").classList.add("hidden");
-  document.getElementById("login").classList.remove("hidden");
-}else{
-  loadLogo();
-}
+          <div class="stat-card section-card">
+            <div class="section-head">
+              <h3>Total registradas</h3>
+              <button class="toggle-visibility-btn" type="button" data-target="totalRegistradasBody">👁</button>
+            </div>
+            <div class="section-body" id="totalRegistradasBody">
+              <div class="stat-number" id="totalCount">0</div>
+              <div class="muted">Ya compartidas en Firebase.</div>
+            </div>
+          </div>
+        </div>
 
-function login(){
-  let u=document.getElementById("user").value;
-  let p=document.getElementById("pass").value;
+        <div class="switch-grid">
+          <div class="switch-box section-card">
+            <div class="section-head">
+              <h3>Automatizaciones</h3>
+              <button class="toggle-visibility-btn" type="button" data-target="automatizacionesBody">👁</button>
+            </div>
+            <div class="section-body" id="automatizacionesBody">
+              <div class="switch-actions">
+                <button id="toggleAlarmBtn" class="btn btn-secondary btn-small" type="button">Alarma: OFF</button>
+                <button id="toggleAutoBusyBtn" class="btn btn-secondary btn-small" type="button">Auto ocupado: OFF</button>
+                <button id="toggleAutoVdoBtn" class="btn btn-secondary btn-small" type="button">Auto VDO.Ninja: OFF</button>
+                <button id="toggleAutoFreeBtn" class="btn btn-secondary btn-small" type="button">Auto disponible: OFF</button>
+              </div>
+              <p class="muted">“Auto disponible” vuelve a disponible al marcar gestionada la solicitud activa.</p>
+            </div>
+          </div>
 
-  let user=USERS.find(x=>x.u===u && x.p===p);
-  if(!user) return alert("Error login");
+          <div class="switch-box section-card">
+            <div class="section-head">
+              <h3>Enlaces VDO.Ninja</h3>
+              <button class="toggle-visibility-btn" type="button" data-target="vdoBody">👁</button>
+            </div>
+            <div class="section-body" id="vdoBody">
+              <p class="muted">Recepción usa el enlace director y las pantallas el enlace invitado.</p>
+              <div class="code" id="vdoInfoCode">Cargando enlaces VDO.Ninja…</div>
+            </div>
+          </div>
+        </div>
 
-  currentUser=user;
+        <div class="grid">
+          <div class="mini-card section-card">
+            <div class="section-head">
+              <h3>Acceso al panel</h3>
+              <button class="toggle-visibility-btn" type="button" data-target="accesoPanelBody">👁</button>
+            </div>
+            <div class="section-body" id="accesoPanelBody">
+              <p class="muted">Abre esta misma web con <span class="code">?admin=1</span> para ver la cara interna.</p>
+              <div class="code" id="adminUrlCode"></div>
+            </div>
+          </div>
 
-  document.getElementById("login").classList.add("hidden");
-  document.getElementById("admin").classList.remove("hidden");
+          <div class="mini-card section-card">
+            <div class="section-head">
+              <h3>Estado visible para socios</h3>
+              <button class="toggle-visibility-btn" type="button" data-target="estadoSociosBody">👁</button>
+            </div>
+            <div class="section-body" id="estadoSociosBody">
+              <div class="status-row">
+                <div class="status-badge available" id="adminStatusBadge">Disponible</div>
+                <div class="queue-pill" id="queueBadge">0 avisos pendientes</div>
+                <div class="auto-pill" id="autoSummaryBadge">Auto: manual</div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-  if(user.role!=="admin"){
-    document.getElementById("usersBox").style.display="none";
-  }
+        <div class="grid">
+          <div class="mini-card section-card">
+            <div class="section-head">
+              <h3>Enlaces directos pantallas</h3>
+              <button class="toggle-visibility-btn" type="button" data-target="linksPantallasBody">👁</button>
+            </div>
+            <div class="section-body" id="linksPantallasBody">
+              <p class="muted">Acceso rápido a cada pantalla pública.</p>
+              <div class="form-grid">
+                <div>
+                  <strong>Sala Alcobendas</strong><br>
+                  <a id="screen1DirectLink" class="direct-link" href="#" target="_blank" rel="noopener noreferrer"></a>
+                </div>
+                <div>
+                  <strong>Recepción Alcobendas</strong><br>
+                  <a id="screen2DirectLink" class="direct-link" href="#" target="_blank" rel="noopener noreferrer"></a>
+                </div>
+              </div>
+            </div>
+          </div>
 
-  loadLogo();
-  loadLinks();
-}
+          <div class="mini-card section-card">
+            <div class="section-head">
+              <h3>Acceso rápido por QR</h3>
+              <button class="toggle-visibility-btn" type="button" data-target="qrRapidoBody">👁</button>
+            </div>
+            <div class="section-body" id="qrRapidoBody">
+              <p class="muted">Puedes abrir cada enlace directamente desde este panel interno.</p>
+            </div>
+          </div>
+        </div>
 
-function loadLinks(){
-  document.getElementById("link1").href=location.origin+location.pathname+"?p=1";
-  document.getElementById("link1").innerText="Pantalla 1";
+        <div id="logoBox" class="mini-card section-card">
+          <div class="section-head">
+            <h3>Logo del sistema</h3>
+            <button class="toggle-visibility-btn" type="button" data-target="logoBody">👁</button>
+          </div>
+          <div class="section-body" id="logoBody">
+            <p class="muted">Sube el logo y se guardará en Firebase para todos los usuarios.</p>
+            <div class="form-grid">
+              <input type="file" id="logoUpload" accept="image/*" />
+              <button id="saveLogoBtn" class="btn btn-primary btn-small" type="button">Guardar logo en la nube</button>
+              <button id="removeLogoBtn" class="btn btn-secondary btn-small" type="button">Quitar logo</button>
+            </div>
+            <div style="margin-top:12px;">
+              <img id="logoPreview" class="logo-preview" src="" alt="Vista previa logo" />
+            </div>
+          </div>
+        </div>
 
-  document.getElementById("link2").href=location.origin+location.pathname+"?p=2";
-  document.getElementById("link2").innerText="Pantalla 2";
-}
+        <div id="usersBox" class="users-box section-card">
+          <div class="section-head">
+            <h3>Usuarios del panel interno</h3>
+            <button class="toggle-visibility-btn" type="button" data-target="usuariosBody">👁</button>
+          </div>
+          <div class="section-body" id="usuariosBody">
+            <p class="muted">Solo los usuarios administradores pueden crear o eliminar usuarios.</p>
 
-async function loadLogo(){
-  const snap=await getDoc(roomRef);
-  if(!snap.exists()) return;
+            <form id="createUserForm" class="form-grid">
+              <input id="newUserEmail" type="email" placeholder="Correo del usuario" />
+              <input id="newUserPassword" type="text" placeholder="Contraseña" />
+              <select id="newUserRole">
+                <option value="user">Usuario</option>
+                <option value="admin">Administrador</option>
+              </select>
+              <button id="createUserBtn" class="btn btn-primary" type="submit">Crear usuario</button>
+              <div id="usersMsg" class="users-msg"></div>
+            </form>
 
-  let logo=snap.data().logo;
+            <div id="usersList" class="users-list"></div>
+          </div>
+        </div>
 
-  if(logo){
-    let img=document.getElementById("logo");
-    img.src=logo;
-    img.style.display="block";
-  }
-}
+        <div class="mini-card section-card">
+          <div class="section-head">
+            <h3>Solicitudes</h3>
+            <button class="toggle-visibility-btn" type="button" data-target="solicitudesBody">👁</button>
+          </div>
+          <div class="section-body" id="solicitudesBody">
+            <div class="tabs">
+              <button class="tab active" type="button" data-filter="all">Todas</button>
+              <button class="tab" type="button" data-filter="1">Sala Alcobendas</button>
+              <button class="tab" type="button" data-filter="2">Recepción Alcobendas</button>
+            </div>
 
-async function saveLogo(){
-  if(currentUser.role!=="admin") return alert("solo admin");
+            <div id="requestsList" class="requests-list"></div>
+            <div id="emptyState" class="empty-state hidden">Todavía no hay solicitudes registradas.</div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
 
-  let file=document.getElementById("logoFile").files[0];
-  let reader=new FileReader();
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
+    import {
+      getFirestore,
+      doc,
+      collection,
+      addDoc,
+      updateDoc,
+      deleteDoc,
+      setDoc,
+      getDoc,
+      getDocs,
+      onSnapshot,
+      query,
+      orderBy,
+      writeBatch,
+      serverTimestamp,
+      Timestamp
+    } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 
-  reader.onload=async e=>{
-    await updateDoc(roomRef,{logo:e.target.result});
-    alert("logo guardado");
-    loadLogo();
-  };
+    const FIREBASE_CONFIG = {
+      apiKey: "AIzaSyB_C4gc8esz6wNIiW17Ig0I9oRtNr1g_bE",
+      authDomain: "nextgym-402e3.firebaseapp.com",
+      projectId: "nextgym-402e3",
+      storageBucket: "nextgym-402e3.firebasestorage.app",
+      messagingSenderId: "386550395511",
+      appId: "1:386550395511:web:2725708cb37372a5f28c72"
+    };
 
-  reader.readAsDataURL(file);
-}
+    const ROOM_ID = 'nextgym';
 
-async function send(){
-  alert("Aviso enviado");
+    const VDO_LINKS = {
+      director: 'https://vdo.ninja/?director=Recepcion_Next_Gym_Alcobendas&password=NoLimits2026&push=fZG4QSq',
+      '1': 'https://vdo.ninja/?room=Recepcion_Next_Gym_Alcobendas&hash=4fa9&safemode&comp&broadcast&do&push=VCrKp3b',
+      '2': 'https://vdo.ninja/?room=Recepcion_Next_Gym_Alcobendas&hash=4fa9&safemode&comp&broadcast&do&push=VCrKp3b'
+    };
 
-  window.open(VDO_LINKS['1'],"_blank");
-}
+    const USERS_STORAGE_KEY = 'nextgym_admin_users';
+    const ADMIN_SESSION_KEY = 'nextgym_admin_auth';
 
-function setAvailable(){ alert("Disponible"); }
-function setBusy(){ alert("No disponible"); }
+    const DEFAULT_USERS = [
+      {
+        email: 'sergio.santidrian@nextgym.es',
+        password: '@Oigres150303',
+        role: 'admin'
+      },
+      {
+        email: 'alicia.lara@nextgym.es',
+        password: 'NoLimits2026',
+        role: 'user'
+      },
+      {
+        email: 'veronica.linares@nextgym.es',
+        password: 'NoLimits2026',
+        role: 'user'
+      }
+    ];
 
-function createUser(){
-  alert("Usuarios locales, versión simple");
-}
+    const params = new URLSearchParams(window.location.search);
+    const isAdmin = params.get('admin') === '1';
+    const screen = params.get('p') || '1';
 
-</script>
+    const screenNames = {
+      '1': 'Sala Alcobendas',
+      '2': 'Recepción Alcobendas'
+    };
 
+    let db = null;
+    let state = {
+      available: true,
+      autoAlarm: false,
+      autoBusy: false,
+      autoVdo: false,
+      autoFree: false,
+      activeRequestId: null,
+      lastVdoOpenedFor: null,
+      logoDataUrl: ''
+    };
+    let requests = [];
+    let lastSeenPendingIds = [];
+    let audioUnlocked = false;
+
+    function hasFirebaseConfig() {
+      return FIREBASE_CONFIG.apiKey && !FIREBASE_CONFIG.apiKey.startsWith('PEGA_AQUI');
+    }
+
+    function stateRef() {
+      return doc(db, 'rooms', ROOM_ID);
+    }
+
+    function requestsRef() {
+      return collection(db, 'rooms', ROOM_ID, 'requests');
+    }
+
+    function requestRef(id) {
+      return doc(db, 'rooms', ROOM_ID, 'requests', id);
+    }
+
+    function buildPublicUrl(screenId) {
+      return `${window.location.origin}${window.location.pathname}?p=${encodeURIComponent(screenId)}`;
+    }
+
+    function buildAdminUrl() {
+      return `${window.location.origin}${window.location.pathname}?admin=1`;
+    }
+
+    function getPendingRequests() {
+      return requests.filter((item) => !item.handled);
+    }
+
+    function getActiveRequest() {
+      const pending = getPendingRequests();
+      return pending.find((item) => item.id === state.activeRequestId) || pending[0] || null;
+    }
+
+    function fmtDate(value) {
+      const date = value instanceof Timestamp ? value.toDate() : new Date(value);
+      return date.toLocaleString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+    }
+
+    function ensureAudioUnlocked() {
+      audioUnlocked = true;
+    }
+
+    function playBeep() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const oscillator = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(880, ctx.currentTime);
+        gainNode.gain.setValueAtTime(0.001, ctx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.02);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+        oscillator.connect(gainNode);
+        gainNode.connect(ctx.destination);
+        oscillator.start();
+        oscillator.stop(ctx.currentTime + 0.36);
+      } catch (_) {}
+    }
+
+    function seedUsersIfNeeded() {
+      const resetUsers = false;
+
+      if (resetUsers) {
+        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(DEFAULT_USERS));
+        return;
+      }
+
+      const existing = localStorage.getItem(USERS_STORAGE_KEY);
+
+      if (!existing) {
+        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(DEFAULT_USERS));
+        return;
+      }
+
+      try {
+        const users = JSON.parse(existing) || [];
+
+        DEFAULT_USERS.forEach(defaultUser => {
+          const exists = users.some(
+            u => u.email.toLowerCase() === defaultUser.email.toLowerCase()
+          );
+          if (!exists) users.push(defaultUser);
+        });
+
+        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+      } catch (_) {
+        localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(DEFAULT_USERS));
+      }
+    }
+
+    function getUsers() {
+      try {
+        return JSON.parse(localStorage.getItem(USERS_STORAGE_KEY)) || [];
+      } catch (_) {
+        return [...DEFAULT_USERS];
+      }
+    }
+
+    function saveUsers(users) {
+      localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
+    }
+
+    function findUserByEmail(email) {
+      return getUsers().find(u => u.email.toLowerCase() === String(email).toLowerCase());
+    }
+
+    function setCurrentSession(user) {
+      sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify({
+        email: user.email,
+        role: user.role
+      }));
+    }
+
+    function getCurrentSession() {
+      try {
+        return JSON.parse(sessionStorage.getItem(ADMIN_SESSION_KEY));
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function isAdminAuthenticated() {
+      return !!getCurrentSession();
+    }
+
+    function currentUserIsAdmin() {
+      return getCurrentSession()?.role === 'admin';
+    }
+
+    function showAdminLogin() {
+      document.getElementById('adminLoginOverlay').classList.remove('hidden');
+    }
+
+    function hideAdminLogin() {
+      document.getElementById('adminLoginOverlay').classList.add('hidden');
+    }
+
+    function logoutAdmin() {
+      sessionStorage.removeItem(ADMIN_SESSION_KEY);
+      showAdminLogin();
+      document.getElementById('adminView').classList.add('hidden');
+    }
+
+    function setupAdminLogin() {
+      if (!isAdmin) return;
+
+      const form = document.getElementById('adminLoginForm');
+      const usernameInput = document.getElementById('adminUsername');
+      const passwordInput = document.getElementById('adminPassword');
+      const errorBox = document.getElementById('loginError');
+
+      if (!isAdminAuthenticated()) {
+        showAdminLogin();
+      } else {
+        hideAdminLogin();
+      }
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        errorBox.textContent = '';
+
+        const email = usernameInput.value.trim();
+        const password = passwordInput.value;
+        const user = findUserByEmail(email);
+
+        if (!user || user.password !== password) {
+          errorBox.textContent = 'Usuario o contraseña incorrectos.';
+          return;
+        }
+
+        setCurrentSession(user);
+        hideAdminLogin();
+        usernameInput.value = '';
+        passwordInput.value = '';
+        render();
+      });
+    }
+
+    function renderUsersPanel() {
+      const usersBox = document.getElementById('usersBox');
+      const usersList = document.getElementById('usersList');
+      const usersMsg = document.getElementById('usersMsg');
+      const createUserForm = document.getElementById('createUserForm');
+
+      const isAdminRole = currentUserIsAdmin();
+
+      if (!isAdminRole) {
+        usersBox.classList.add('hidden');
+        return;
+      }
+
+      usersBox.classList.remove('hidden');
+      usersList.innerHTML = '';
+      usersMsg.textContent = '';
+      usersMsg.className = 'users-msg';
+      createUserForm.classList.remove('hidden');
+
+      const users = getUsers();
+
+      users.forEach(user => {
+        const item = document.createElement('div');
+        item.className = 'user-item';
+        item.innerHTML = `
+          <div>
+            <strong>${user.email}</strong>
+            <div class="muted">${user.role === 'admin' ? '<span class="pill-admin">Administrador</span>' : 'Usuario estándar'}</div>
+          </div>
+          <div class="user-row">
+            ${user.email !== 'sergio.santidrian@nextgym.es'
+              ? `<button class="btn btn-danger btn-small" data-action="delete-user" data-email="${user.email}" type="button">Eliminar</button>`
+              : ''}
+          </div>
+        `;
+        usersList.appendChild(item);
+      });
+    }
+
+    function applyRolePermissions() {
+      const isAdminRole = currentUserIsAdmin();
+      const clearAllBtn = document.getElementById('clearAllBtn');
+
+      if (!clearAllBtn) return;
+
+      if (isAdminRole) {
+        clearAllBtn.classList.remove('hidden');
+        clearAllBtn.disabled = false;
+      } else {
+        clearAllBtn.classList.add('hidden');
+        clearAllBtn.disabled = true;
+      }
+    }
+
+    function renderDirectLinks() {
+      const screen1 = buildPublicUrl('1');
+      const screen2 = buildPublicUrl('2');
+
+      const screen1El = document.getElementById('screen1DirectLink');
+      const screen2El = document.getElementById('screen2DirectLink');
+
+      if (screen1El) {
+        screen1El.href = screen1;
+        screen1El.textContent = screen1;
+      }
+
+      if (screen2El) {
+        screen2El.href = screen2;
+        screen2El.textContent = screen2;
+      }
+    }
+
+    function renderLogo() {
+      const logoImg = document.getElementById('logoImg');
+      const logoPreview = document.getElementById('logoPreview');
+      const logo = state.logoDataUrl || '';
+
+      if (logoImg) {
+        if (logo) {
+          logoImg.src = logo;
+          logoImg.style.display = 'block';
+        } else {
+          logoImg.src = '';
+          logoImg.style.display = 'none';
+        }
+      }
+
+      if (logoPreview) {
+        if (logo) {
+          logoPreview.src = logo;
+          logoPreview.style.display = 'block';
+        } else {
+          logoPreview.src = '';
+          logoPreview.style.display = 'none';
+        }
+      }
+    }
+
+    function applyAdminOnlySections() {
+      const isAdminRole = currentUserIsAdmin();
+      const usersBox = document.getElementById('usersBox');
+      const logoBox = document.getElementById('logoBox');
+
+      if (usersBox) {
+        usersBox.classList.toggle('hidden', !isAdminRole);
+      }
+
+      if (logoBox) {
+        logoBox.classList.toggle('hidden', !isAdminRole);
+      }
+    }
+
+    function setupUserCreation() {
+      const form = document.getElementById('createUserForm');
+      const msg = document.getElementById('usersMsg');
+
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        msg.textContent = '';
+        msg.className = 'users-msg';
+
+        if (!currentUserIsAdmin()) {
+          msg.textContent = 'No tienes permisos para crear usuarios.';
+          msg.className = 'users-msg error';
+          return;
+        }
+
+        const email = document.getElementById('newUserEmail').value.trim().toLowerCase();
+        const password = document.getElementById('newUserPassword').value.trim();
+        const role = document.getElementById('newUserRole').value;
+
+        if (!email || !password) {
+          msg.textContent = 'Debes rellenar correo y contraseña.';
+          msg.className = 'users-msg error';
+          return;
+        }
+
+        const users = getUsers();
+        if (users.some(u => u.email.toLowerCase() === email)) {
+          msg.textContent = 'Ese usuario ya existe.';
+          msg.className = 'users-msg error';
+          return;
+        }
+
+        users.push({ email, password, role });
+        saveUsers(users);
+
+        form.reset();
+        msg.textContent = 'Usuario creado correctamente.';
+        msg.className = 'users-msg success';
+        renderUsersPanel();
+      });
+
+      document.getElementById('usersList').addEventListener('click', (event) => {
+        const btn = event.target.closest('button[data-action="delete-user"]');
+        if (!btn) return;
+
+        if (!currentUserIsAdmin()) return;
+
+        const email = btn.dataset.email;
+        const users = getUsers().filter(u => u.email !== email);
+        saveUsers(users);
+        renderUsersPanel();
+      });
+    }
+
+    function setupSectionToggles() {
+      document.addEventListener('click', (event) => {
+        const btn = event.target.closest('.toggle-visibility-btn');
+        if (!btn) return;
+
+        const targetId = btn.dataset.target;
+        const target = document.getElementById(targetId);
+        if (!target) return;
+
+        target.classList.toggle('hidden-section');
+        btn.textContent = target.classList.contains('hidden-section') ? '🙈' : '👁';
+      });
+    }
+
+    function setupLogoUpload() {
+      const input = document.getElementById('logoUpload');
+      const saveBtn = document.getElementById('saveLogoBtn');
+      const removeBtn = document.getElementById('removeLogoBtn');
+      const preview = document.getElementById('logoPreview');
+
+      if (!input || !saveBtn || !removeBtn) return;
+
+      let pendingLogoDataUrl = '';
+
+      input.addEventListener('change', () => {
+        const file = input.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          pendingLogoDataUrl = e.target?.result || '';
+          if (preview && pendingLogoDataUrl) {
+            preview.src = pendingLogoDataUrl;
+            preview.style.display = 'block';
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+
+      saveBtn.addEventListener('click', async () => {
+        if (!currentUserIsAdmin()) {
+          alert('Solo un administrador puede cambiar el logo.');
+          return;
+        }
+
+        if (!pendingLogoDataUrl) {
+          alert('Selecciona una imagen primero.');
+          return;
+        }
+
+        try {
+          await updateDoc(stateRef(), {
+            logoDataUrl: pendingLogoDataUrl
+          });
+          pendingLogoDataUrl = '';
+          input.value = '';
+          alert('Logo guardado en Firebase correctamente.');
+        } catch (error) {
+          console.error(error);
+          alert('No se pudo guardar el logo.');
+        }
+      });
+
+      removeBtn.addEventListener('click', async () => {
+        if (!currentUserIsAdmin()) {
+          alert('Solo un administrador puede quitar el logo.');
+          return;
+        }
+
+        try {
+          await updateDoc(stateRef(), {
+            logoDataUrl: ''
+          });
+          pendingLogoDataUrl = '';
+          input.value = '';
+          if (preview) {
+            preview.src = '';
+            preview.style.display = 'none';
+          }
+          alert('Logo eliminado.');
+        } catch (error) {
+          console.error(error);
+          alert('No se pudo quitar el logo.');
+        }
+      });
+    }
+
+    async function openVdoForRequest(request) {
+      if (!request) return;
+
+      window.open(VDO_LINKS.director, '_blank', 'noopener,noreferrer');
+
+      await updateDoc(stateRef(), {
+        lastVdoOpenedFor: request.id
+      });
+    }
+
+    async function setAvailability(isAvailable) {
+      await updateDoc(stateRef(), {
+        available: isAvailable,
+        ...(isAvailable ? { activeRequestId: null } : {})
+      });
+    }
+
+    async function toggleFlag(flagName) {
+      await updateDoc(stateRef(), { [flagName]: !state[flagName] });
+    }
+
+    async function addRequest(screenId) {
+      const newRequest = {
+        screen: String(screenId),
+        screenLabel: screenNames[String(screenId)] || `Pantalla ${screenId}`,
+        createdAt: serverTimestamp(),
+        handled: false
+      };
+      const created = await addDoc(requestsRef(), newRequest);
+      const patch = {};
+      if (state.autoBusy) patch.available = false;
+      if (!state.activeRequestId) patch.activeRequestId = created.id;
+      if (Object.keys(patch).length) await updateDoc(stateRef(), patch);
+      return { id: created.id, ...newRequest };
+    }
+
+    async function markHandled(id) {
+      const request = requests.find((item) => item.id === id);
+      await updateDoc(requestRef(id), { handled: true });
+      const patch = { lastVdoOpenedFor: id };
+      if (state.activeRequestId === id) patch.activeRequestId = null;
+      if (state.autoFree && state.activeRequestId === id) patch.available = true;
+      await updateDoc(stateRef(), patch);
+      const pendingAfter = getPendingRequests().filter((item) => item.id !== id);
+      if (state.autoFree && !pendingAfter.length) {
+        await updateDoc(stateRef(), { available: true });
+      }
+      return request;
+    }
+
+    async function removeRequest(id) {
+      const patch = {};
+      if (state.activeRequestId === id) patch.activeRequestId = null;
+      await deleteDoc(requestRef(id));
+      if (Object.keys(patch).length) await updateDoc(stateRef(), patch);
+    }
+
+    async function clearAllRequests() {
+      const snap = await getDocs(requestsRef());
+      const batch = writeBatch(db);
+      snap.forEach((item) => batch.delete(item.ref));
+      batch.update(stateRef(), { activeRequestId: null });
+      await batch.commit();
+    }
+
+    async function setActiveRequest(id) {
+      await updateDoc(stateRef(), { activeRequestId: id });
+    }
+
+    async function ensureRoomState() {
+      const roomSnap = await getDoc(stateRef());
+      if (!roomSnap.exists()) {
+        await setDoc(stateRef(), {
+          available: true,
+          autoAlarm: false,
+          autoBusy: false,
+          autoVdo: false,
+          autoFree: false,
+          activeRequestId: null,
+          lastVdoOpenedFor: null,
+          logoDataUrl: '',
+          updatedAt: serverTimestamp()
+        });
+      }
+    }
+
+    async function maybeRunAutomations() {
+      if (!isAdmin) return;
+      const pending = getPendingRequests();
+      const pendingIds = pending.map((item) => item.id);
+      const newPending = pending.filter((item) => !lastSeenPendingIds.includes(item.id));
+      const activeRequest = getActiveRequest();
+
+      if (newPending.length && state.autoAlarm && audioUnlocked) {
+        playBeep();
+        setTimeout(playBeep, 420);
+      }
+
+      if (newPending.length && state.autoBusy && state.available) {
+        await updateDoc(stateRef(), { available: false });
+        lastSeenPendingIds = pendingIds;
+        return;
+      }
+
+      if (newPending.length && state.autoVdo && activeRequest && state.lastVdoOpenedFor !== activeRequest.id) {
+        lastSeenPendingIds = pendingIds;
+        await openVdoForRequest(activeRequest);
+        return;
+      }
+
+      lastSeenPendingIds = pendingIds;
+    }
+
+    function renderPublic() {
+      const currentScreenLabel = screenNames[screen] || `Pantalla ${screen}`;
+      const publicUrl = buildPublicUrl(screen);
+      const activeRequest = getActiveRequest();
+      const thisScreenIsActive = activeRequest && activeRequest.screen === String(screen) && !activeRequest.handled;
+
+      document.getElementById('modeLabel').textContent = 'Modo pantalla';
+      document.getElementById('screenBadge').textContent = currentScreenLabel;
+
+      const title = document.getElementById('publicTitle');
+      const subtitle = document.getElementById('publicSubtitle');
+      const message = document.getElementById('publicMessage');
+      const statusBadge = document.getElementById('publicStatusBadge');
+      const button = document.getElementById('requestHelpButton');
+
+      if (thisScreenIsActive) {
+        title.textContent = 'Te estamos atendiendo';
+        subtitle.textContent = 'Recepción ha recibido la solicitud de esta pantalla. En breve se abrirá la videollamada o te atenderemos directamente.';
+        message.textContent = 'Solicitud activa en curso para esta pantalla.';
+        message.className = 'hero-message attending';
+        statusBadge.textContent = 'Atendiendo';
+        statusBadge.className = 'status-badge attending';
+        button.disabled = true;
+        button.textContent = 'Solicitud enviada';
+        button.className = 'btn btn-blue';
+      } else if (state.available) {
+        title.textContent = '¿Necesitas ayuda?';
+        subtitle.textContent = 'Escanea el código QR con tu móvil para avisar a recepción. Si estamos disponibles, tu solicitud entrará al instante.';
+        message.textContent = 'Estamos disponibles. Tu solicitud se mostrará en el panel de recepción.';
+        message.className = 'hero-message available';
+        statusBadge.textContent = 'Disponible';
+        statusBadge.className = 'status-badge available';
+        button.disabled = false;
+        button.textContent = 'Solicitar ayuda ahora';
+        button.className = 'btn btn-primary';
+      } else {
+        title.textContent = 'Ahora mismo estamos ocupados';
+        subtitle.textContent = 'Puedes escanear igualmente el QR y dejar tu aviso. En cuanto quedemos disponibles veremos la solicitud en el panel interno.';
+        message.textContent = 'No disponibles en este momento. Tu solicitud quedará en cola para ser atendida.';
+        message.className = 'hero-message busy';
+        statusBadge.textContent = 'No disponible';
+        statusBadge.className = 'status-badge busy';
+        button.disabled = false;
+        button.textContent = 'Dejar aviso en cola';
+        button.className = 'btn btn-warning';
+      }
+
+      const qrContainer = document.getElementById('qrcode');
+      qrContainer.innerHTML = '';
+      new QRCode(qrContainer, {
+        text: publicUrl,
+        width: 220,
+        height: 220,
+        correctLevel: QRCode.CorrectLevel.H
+      });
+
+      renderLogo();
+    }
+
+    function renderAdmin() {
+      document.getElementById('modeLabel').textContent = 'Modo panel interno';
+      const filter = document.querySelector('.tab.active')?.dataset.filter || 'all';
+      const filtered = requests.filter((item) => filter === 'all' ? true : item.screen === filter);
+      const pending = getPendingRequests().length;
+      const activeRequest = getActiveRequest();
+
+      document.getElementById('statusSummary').textContent = state.available ? 'Disponible' : 'No disponible';
+      document.getElementById('pendingCount').textContent = pending;
+      document.getElementById('totalCount').textContent = requests.length;
+      document.getElementById('adminUrlCode').textContent = buildAdminUrl();
+      document.getElementById('queueBadge').textContent = `${pending} aviso${pending === 1 ? '' : 's'} pendientes`;
+      document.getElementById('vdoInfoCode').textContent =
+        `Director recepción:\n${VDO_LINKS.director}\n\nPantalla invitado:\n${VDO_LINKS['1']}`;
+
+      const adminStatusBadge = document.getElementById('adminStatusBadge');
+      if (activeRequest) {
+        adminStatusBadge.textContent = `Atendiendo ${activeRequest.screenLabel}`;
+        adminStatusBadge.className = 'status-badge attending';
+      } else if (state.available) {
+        adminStatusBadge.textContent = 'Disponible';
+        adminStatusBadge.className = 'status-badge available';
+      } else {
+        adminStatusBadge.textContent = 'No disponible';
+        adminStatusBadge.className = 'status-badge busy';
+      }
+
+      const autoTexts = [];
+      if (state.autoAlarm) autoTexts.push('alarma');
+      if (state.autoBusy) autoTexts.push('ocupado');
+      if (state.autoVdo) autoTexts.push('VDO');
+      if (state.autoFree) autoTexts.push('disponible');
+      document.getElementById('autoSummaryBadge').textContent = autoTexts.length ? `Auto: ${autoTexts.join(' + ')}` : 'Auto: manual';
+
+      const toggleAlarmBtn = document.getElementById('toggleAlarmBtn');
+      const toggleAutoBusyBtn = document.getElementById('toggleAutoBusyBtn');
+      const toggleAutoVdoBtn = document.getElementById('toggleAutoVdoBtn');
+      const toggleAutoFreeBtn = document.getElementById('toggleAutoFreeBtn');
+
+      toggleAlarmBtn.textContent = `Alarma: ${state.autoAlarm ? 'ON' : 'OFF'}`;
+      toggleAutoBusyBtn.textContent = `Auto ocupado: ${state.autoBusy ? 'ON' : 'OFF'}`;
+      toggleAutoVdoBtn.textContent = `Auto VDO.Ninja: ${state.autoVdo ? 'ON' : 'OFF'}`;
+      toggleAutoFreeBtn.textContent = `Auto disponible: ${state.autoFree ? 'ON' : 'OFF'}`;
+
+      toggleAlarmBtn.className = state.autoAlarm ? 'btn btn-success btn-small' : 'btn btn-secondary btn-small';
+      toggleAutoBusyBtn.className = state.autoBusy ? 'btn btn-success btn-small' : 'btn btn-secondary btn-small';
+      toggleAutoVdoBtn.className = state.autoVdo ? 'btn btn-success btn-small' : 'btn btn-secondary btn-small';
+      toggleAutoFreeBtn.className = state.autoFree ? 'btn btn-success btn-small' : 'btn btn-secondary btn-small';
+
+      const list = document.getElementById('requestsList');
+      const emptyState = document.getElementById('emptyState');
+      list.innerHTML = '';
+
+      if (!filtered.length) emptyState.classList.remove('hidden');
+      else emptyState.classList.add('hidden');
+
+      filtered.forEach((item) => {
+        const card = document.createElement('article');
+        card.className = 'request-card';
+        const pendingClass = item.handled
+          ? 'status-badge available'
+          : (item.id === state.activeRequestId ? 'status-badge attending' : 'status-badge busy');
+        const isActive = item.id === state.activeRequestId && !item.handled;
+
+        card.innerHTML = `
+          <div class="request-head">
+            <div>
+              <h3 class="request-title">Solicitud desde ${item.screenLabel}</h3>
+              <div class="request-meta">Registrada el ${fmtDate(item.createdAt)}</div>
+            </div>
+            <div class="${pendingClass}">${item.handled ? 'Gestionada' : (isActive ? 'Atendiendo' : 'Pendiente')}</div>
+          </div>
+          <div class="request-actions">
+            ${!item.handled && !isActive ? `<button class="btn btn-blue btn-small" data-action="activate" data-id="${item.id}" type="button">Atender esta</button>` : ''}
+            ${!item.handled ? `<button class="btn btn-warning btn-small" data-action="open-vdo" data-id="${item.id}" type="button">Abrir recepción VDO</button>` : ''}
+            ${!item.handled ? `<button class="btn btn-success btn-small" data-action="handle" data-id="${item.id}" type="button">Marcar gestionada</button>` : ''}
+            ${currentUserIsAdmin() ? `<button class="btn btn-secondary btn-small" data-action="delete" data-id="${item.id}" type="button">Eliminar</button>` : ''}
+          </div>
+        `;
+        list.appendChild(card);
+      });
+
+      renderUsersPanel();
+      applyRolePermissions();
+      renderDirectLinks();
+      renderLogo();
+      applyAdminOnlySections();
+    }
+
+    function render() {
+      if (isAdmin) {
+        if (!isAdminAuthenticated()) {
+          document.getElementById('screenView').classList.add('hidden');
+          document.getElementById('adminView').classList.add('hidden');
+          showAdminLogin();
+          return;
+        }
+
+        hideAdminLogin();
+        document.getElementById('screenView').classList.add('hidden');
+        document.getElementById('adminView').classList.remove('hidden');
+        renderAdmin();
+      } else {
+        document.getElementById('adminView').classList.add('hidden');
+        document.getElementById('screenView').classList.remove('hidden');
+        renderPublic();
+      }
+    }
+
+    document.body.addEventListener('click', ensureAudioUnlocked, { once: true });
+    document.body.addEventListener('keydown', ensureAudioUnlocked, { once: true });
+
+    document.getElementById('requestHelpButton').addEventListener('click', async () => {
+      await addRequest(screen);
+
+      if (state.autoVdo) {
+        const guestUrl = VDO_LINKS[screen] || VDO_LINKS['1'];
+        window.open(guestUrl, '_blank', 'noopener,noreferrer');
+      }
+
+      alert(`Aviso enviado correctamente desde ${screenNames[screen] || `Pantalla ${screen}`}.`);
+    });
+
+    document.getElementById('setAvailableBtn')?.addEventListener('click', () => setAvailability(true));
+    document.getElementById('setBusyBtn')?.addEventListener('click', () => setAvailability(false));
+    document.getElementById('clearAllBtn')?.addEventListener('click', async () => {
+      if (!currentUserIsAdmin()) return;
+      if (confirm('¿Seguro que quieres borrar todos los avisos?')) await clearAllRequests();
+    });
+    document.getElementById('toggleAlarmBtn')?.addEventListener('click', () => toggleFlag('autoAlarm'));
+    document.getElementById('toggleAutoBusyBtn')?.addEventListener('click', () => toggleFlag('autoBusy'));
+    document.getElementById('toggleAutoVdoBtn')?.addEventListener('click', () => toggleFlag('autoVdo'));
+    document.getElementById('toggleAutoFreeBtn')?.addEventListener('click', () => toggleFlag('autoFree'));
+    document.getElementById('logoutBtn')?.addEventListener('click', logoutAdmin);
+
+    document.querySelectorAll('.tab').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach((t) => t.classList.remove('active'));
+        tab.classList.add('active');
+        render();
+      });
+    });
+
+    document.getElementById('requestsList').addEventListener('click', async (event) => {
+      const button = event.target.closest('button[data-action]');
+      if (!button) return;
+
+      const { action, id } = button.dataset;
+      const request = requests.find((item) => item.id === id);
+
+      if (action === 'handle') {
+        await markHandled(id);
+        return;
+      }
+
+      if (action === 'activate') {
+        await setActiveRequest(id);
+        return;
+      }
+
+      if (action === 'open-vdo' && request) {
+        await setActiveRequest(id);
+        await openVdoForRequest(request);
+        return;
+      }
+
+      if (action === 'delete') {
+        if (!currentUserIsAdmin()) return;
+        await removeRequest(id);
+      }
+    });
+
+    async function initFirebase() {
+      if (!hasFirebaseConfig()) {
+        render();
+        return;
+      }
+
+      const app = initializeApp(FIREBASE_CONFIG);
+      db = getFirestore(app);
+      await ensureRoomState();
+
+      onSnapshot(stateRef(), async (snap) => {
+        if (snap.exists()) {
+          state = { ...state, ...snap.data() };
+          render();
+          await maybeRunAutomations();
+        }
+      });
+
+      onSnapshot(query(requestsRef(), orderBy('createdAt', 'desc')), async (snap) => {
+        requests = snap.docs.map((item) => ({ id: item.id, ...item.data() }));
+        render();
+        await maybeRunAutomations();
+      });
+    }
+
+    seedUsersIfNeeded();
+    setupAdminLogin();
+    setupUserCreation();
+    setupSectionToggles();
+    setupLogoUpload();
+    render();
+    initFirebase();
+  </script>
 </body>
 </html>
