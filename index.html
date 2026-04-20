@@ -163,7 +163,7 @@
     .admin-title { margin: 0; font-size: 2rem; line-height: 1.1; }
     .admin-subtitle { margin: 8px 0 0; color: rgba(255,255,255,0.82); line-height: 1.55; max-width: 800px; }
     .mini-card, .stat-card, .request-card, .switch-box, .users-box { padding: 18px; }
-    .mini-card h3, .stat-card h3, .switch-box h3, .users-box h3 { margin: 0 0 10px; font-size: 1rem; }
+    .mini-card h3, .stat-card h3, .switch-box h3, .users-box h3 { margin: 0; font-size: 1rem; }
     .stat-number { font-size: 2rem; font-weight: 800; margin-bottom: 6px; }
     .muted { color: rgba(255,255,255,0.68); }
 
@@ -223,6 +223,34 @@
     }
     .direct-link:hover {
       text-decoration: underline;
+    }
+
+    .section-card {
+      position: relative;
+    }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .toggle-visibility-btn {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.08);
+      color: var(--white);
+      border-radius: 12px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+    }
+    .toggle-visibility-btn:hover {
+      background: rgba(255,255,255,0.14);
+    }
+    .section-body.hidden-section {
+      display: none;
     }
 
     .admin-login-overlay {
@@ -382,105 +410,167 @@
         </div>
 
         <div class="stats-grid">
-          <div class="stat-card">
-            <h3>Estado actual</h3>
-            <div class="stat-number" id="statusSummary">Disponible</div>
-            <div class="muted">Este estado se refleja en las pantallas públicas.</div>
+          <div class="stat-card section-card">
+            <div class="section-head">
+              <h3>Estado actual</h3>
+              <button class="toggle-visibility-btn" type="button" data-target="estadoActualBody">👁</button>
+            </div>
+            <div class="section-body" id="estadoActualBody">
+              <div class="stat-number" id="statusSummary">Disponible</div>
+              <div class="muted">Este estado se refleja en las pantallas públicas.</div>
+            </div>
           </div>
-          <div class="stat-card">
-            <h3>Solicitudes pendientes</h3>
-            <div class="stat-number" id="pendingCount">0</div>
-            <div class="muted">Avisos aún sin gestionar.</div>
+
+          <div class="stat-card section-card">
+            <div class="section-head">
+              <h3>Solicitudes pendientes</h3>
+              <button class="toggle-visibility-btn" type="button" data-target="solicitudesPendientesBody">👁</button>
+            </div>
+            <div class="section-body" id="solicitudesPendientesBody">
+              <div class="stat-number" id="pendingCount">0</div>
+              <div class="muted">Avisos aún sin gestionar.</div>
+            </div>
           </div>
-          <div class="stat-card">
-            <h3>Total registradas</h3>
-            <div class="stat-number" id="totalCount">0</div>
-            <div class="muted">Ya compartidas en Firebase.</div>
+
+          <div class="stat-card section-card">
+            <div class="section-head">
+              <h3>Total registradas</h3>
+              <button class="toggle-visibility-btn" type="button" data-target="totalRegistradasBody">👁</button>
+            </div>
+            <div class="section-body" id="totalRegistradasBody">
+              <div class="stat-number" id="totalCount">0</div>
+              <div class="muted">Ya compartidas en Firebase.</div>
+            </div>
           </div>
         </div>
 
         <div class="switch-grid">
-          <div class="switch-box">
-            <h3>Automatizaciones</h3>
-            <div class="switch-actions">
-              <button id="toggleAlarmBtn" class="btn btn-secondary btn-small" type="button">Alarma: OFF</button>
-              <button id="toggleAutoBusyBtn" class="btn btn-secondary btn-small" type="button">Auto ocupado: OFF</button>
-              <button id="toggleAutoVdoBtn" class="btn btn-secondary btn-small" type="button">Auto VDO.Ninja: OFF</button>
-              <button id="toggleAutoFreeBtn" class="btn btn-secondary btn-small" type="button">Auto disponible: OFF</button>
+          <div class="switch-box section-card">
+            <div class="section-head">
+              <h3>Automatizaciones</h3>
+              <button class="toggle-visibility-btn" type="button" data-target="automatizacionesBody">👁</button>
             </div>
-            <p class="muted">“Auto disponible” vuelve a disponible al marcar gestionada la solicitud activa.</p>
+            <div class="section-body" id="automatizacionesBody">
+              <div class="switch-actions">
+                <button id="toggleAlarmBtn" class="btn btn-secondary btn-small" type="button">Alarma: OFF</button>
+                <button id="toggleAutoBusyBtn" class="btn btn-secondary btn-small" type="button">Auto ocupado: OFF</button>
+                <button id="toggleAutoVdoBtn" class="btn btn-secondary btn-small" type="button">Auto VDO.Ninja: OFF</button>
+                <button id="toggleAutoFreeBtn" class="btn btn-secondary btn-small" type="button">Auto disponible: OFF</button>
+              </div>
+              <p class="muted">“Auto disponible” vuelve a disponible al marcar gestionada la solicitud activa.</p>
+            </div>
           </div>
 
-          <div class="switch-box">
-            <h3>Enlaces VDO.Ninja</h3>
-            <p class="muted">Configura la sala que debe abrirse al llegar una solicitud.</p>
-            <div class="code" id="vdoInfoCode">Pantalla 1 y Pantalla 2 configurables en el código.</div>
-          </div>
-        </div>
-
-        <div class="grid">
-          <div class="mini-card">
-            <h3>Acceso al panel</h3>
-            <p class="muted">Abre esta misma web con <span class="code">?admin=1</span> para ver la cara interna.</p>
-            <div class="code" id="adminUrlCode"></div>
-          </div>
-          <div class="mini-card">
-            <h3>Estado visible para socios</h3>
-            <div class="status-row">
-              <div class="status-badge available" id="adminStatusBadge">Disponible</div>
-              <div class="queue-pill" id="queueBadge">0 avisos pendientes</div>
-              <div class="auto-pill" id="autoSummaryBadge">Auto: manual</div>
+          <div class="switch-box section-card">
+            <div class="section-head">
+              <h3>Enlaces VDO.Ninja</h3>
+              <button class="toggle-visibility-btn" type="button" data-target="vdoBody">👁</button>
+            </div>
+            <div class="section-body" id="vdoBody">
+              <p class="muted">Configura la sala que debe abrirse al llegar una solicitud.</p>
+              <div class="code" id="vdoInfoCode">Pantalla 1 y Pantalla 2 configurables en el código.</div>
             </div>
           </div>
         </div>
 
         <div class="grid">
-          <div class="mini-card">
-            <h3>Enlaces directos pantallas</h3>
-            <p class="muted">Acceso rápido a cada pantalla pública.</p>
-            <div class="form-grid">
-              <div>
-                <strong>Sala Alcobendas</strong><br>
-                <a id="screen1DirectLink" class="direct-link" href="#" target="_blank" rel="noopener noreferrer"></a>
-              </div>
-              <div>
-                <strong>Recepción Alcobendas</strong><br>
-                <a id="screen2DirectLink" class="direct-link" href="#" target="_blank" rel="noopener noreferrer"></a>
+          <div class="mini-card section-card">
+            <div class="section-head">
+              <h3>Acceso al panel</h3>
+              <button class="toggle-visibility-btn" type="button" data-target="accesoPanelBody">👁</button>
+            </div>
+            <div class="section-body" id="accesoPanelBody">
+              <p class="muted">Abre esta misma web con <span class="code">?admin=1</span> para ver la cara interna.</p>
+              <div class="code" id="adminUrlCode"></div>
+            </div>
+          </div>
+
+          <div class="mini-card section-card">
+            <div class="section-head">
+              <h3>Estado visible para socios</h3>
+              <button class="toggle-visibility-btn" type="button" data-target="estadoSociosBody">👁</button>
+            </div>
+            <div class="section-body" id="estadoSociosBody">
+              <div class="status-row">
+                <div class="status-badge available" id="adminStatusBadge">Disponible</div>
+                <div class="queue-pill" id="queueBadge">0 avisos pendientes</div>
+                <div class="auto-pill" id="autoSummaryBadge">Auto: manual</div>
               </div>
             </div>
           </div>
-          <div class="mini-card">
-            <h3>Acceso rápido por QR</h3>
-            <p class="muted">Puedes abrir cada enlace directamente desde este panel interno.</p>
+        </div>
+
+        <div class="grid">
+          <div class="mini-card section-card">
+            <div class="section-head">
+              <h3>Enlaces directos pantallas</h3>
+              <button class="toggle-visibility-btn" type="button" data-target="linksPantallasBody">👁</button>
+            </div>
+            <div class="section-body" id="linksPantallasBody">
+              <p class="muted">Acceso rápido a cada pantalla pública.</p>
+              <div class="form-grid">
+                <div>
+                  <strong>Sala Alcobendas</strong><br>
+                  <a id="screen1DirectLink" class="direct-link" href="#" target="_blank" rel="noopener noreferrer"></a>
+                </div>
+                <div>
+                  <strong>Recepción Alcobendas</strong><br>
+                  <a id="screen2DirectLink" class="direct-link" href="#" target="_blank" rel="noopener noreferrer"></a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mini-card section-card">
+            <div class="section-head">
+              <h3>Acceso rápido por QR</h3>
+              <button class="toggle-visibility-btn" type="button" data-target="qrRapidoBody">👁</button>
+            </div>
+            <div class="section-body" id="qrRapidoBody">
+              <p class="muted">Puedes abrir cada enlace directamente desde este panel interno.</p>
+            </div>
           </div>
         </div>
 
-        <div id="usersBox" class="users-box">
-          <h3>Usuarios del panel interno</h3>
-          <p class="muted">Solo los usuarios administradores pueden crear o eliminar usuarios.</p>
+        <div id="usersBox" class="users-box section-card">
+          <div class="section-head">
+            <h3>Usuarios del panel interno</h3>
+            <button class="toggle-visibility-btn" type="button" data-target="usuariosBody">👁</button>
+          </div>
+          <div class="section-body" id="usuariosBody">
+            <p class="muted">Solo los usuarios administradores pueden crear o eliminar usuarios.</p>
 
-          <form id="createUserForm" class="form-grid">
-            <input id="newUserEmail" type="email" placeholder="Correo del usuario" />
-            <input id="newUserPassword" type="text" placeholder="Contraseña" />
-            <select id="newUserRole">
-              <option value="user">Usuario</option>
-              <option value="admin">Administrador</option>
-            </select>
-            <button id="createUserBtn" class="btn btn-primary" type="submit">Crear usuario</button>
-            <div id="usersMsg" class="users-msg"></div>
-          </form>
+            <form id="createUserForm" class="form-grid">
+              <input id="newUserEmail" type="email" placeholder="Correo del usuario" />
+              <input id="newUserPassword" type="text" placeholder="Contraseña" />
+              <select id="newUserRole">
+                <option value="user">Usuario</option>
+                <option value="admin">Administrador</option>
+              </select>
+              <button id="createUserBtn" class="btn btn-primary" type="submit">Crear usuario</button>
+              <div id="usersMsg" class="users-msg"></div>
+            </form>
 
-          <div id="usersList" class="users-list"></div>
+            <div id="usersList" class="users-list"></div>
+          </div>
         </div>
 
-        <div class="tabs">
-          <button class="tab active" type="button" data-filter="all">Todas</button>
-          <button class="tab" type="button" data-filter="1">Sala Alcobendas</button>
-          <button class="tab" type="button" data-filter="2">Recepción Alcobendas</button>
-        </div>
+        <div class="mini-card section-card">
+          <div class="section-head">
+            <h3>Solicitudes</h3>
+            <button class="toggle-visibility-btn" type="button" data-target="solicitudesBody">👁</button>
+          </div>
+          <div class="section-body" id="solicitudesBody">
+            <div class="tabs">
+              <button class="tab active" type="button" data-filter="all">Todas</button>
+              <button class="tab" type="button" data-filter="1">Sala Alcobendas</button>
+              <button class="tab" type="button" data-filter="2">Recepción Alcobendas</button>
+            </div>
 
-        <div id="requestsList" class="requests-list"></div>
-        <div id="emptyState" class="empty-state hidden">Todavía no hay solicitudes registradas.</div>
+            <div id="requestsList" class="requests-list"></div>
+            <div id="emptyState" class="empty-state hidden">Todavía no hay solicitudes registradas.</div>
+          </div>
+        </div>
       </section>
     </main>
   </div>
@@ -878,6 +968,20 @@
       });
     }
 
+    function setupSectionToggles() {
+      document.addEventListener('click', (event) => {
+        const btn = event.target.closest('.toggle-visibility-btn');
+        if (!btn) return;
+
+        const targetId = btn.dataset.target;
+        const target = document.getElementById(targetId);
+        if (!target) return;
+
+        target.classList.toggle('hidden-section');
+        btn.textContent = target.classList.contains('hidden-section') ? '🙈' : '👁';
+      });
+    }
+
     async function openVdoForRequest(request) {
       if (!request) return;
       const url = VDO_LINKS[request.screen];
@@ -1236,6 +1340,7 @@
     seedUsersIfNeeded();
     setupAdminLogin();
     setupUserCreation();
+    setupSectionToggles();
     render();
     initFirebase();
   </script>
